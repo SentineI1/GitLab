@@ -13,19 +13,18 @@ class TestDCAnalyzer(unittest.TestCase):
         self.assertAlmostEqual(result["current_a"], 0.0)
         self.assertAlmostEqual(result["power_w"], 0.0)
 
-    def test_series_resistors(self):
+    def test_series_circuit(self):
         result = analyze_dc(12, series(3, 3))
         self.assertAlmostEqual(result["resistance_ohm"], 6.0)
         self.assertAlmostEqual(result["current_a"], 2.0)
 
-    def test_parallel_resistors(self):
+    def test_parallel_circuit(self):
         result = analyze_dc(12, parallel(12, 12))
         self.assertAlmostEqual(result["resistance_ohm"], 6.0)
         self.assertAlmostEqual(result["current_a"], 2.0)
 
-    def test_mixed_resistors(self):
-        circuit = series(6, parallel(12, 12))
-        result = analyze_dc(12, circuit)
+    def test_mixed_circuit(self):
+        result = analyze_dc(12, series(6, parallel(12, 12)))
         self.assertAlmostEqual(result["resistance_ohm"], 12.0)
         self.assertAlmostEqual(result["current_a"], 1.0)
         self.assertAlmostEqual(result["power_w"], 12.0)
