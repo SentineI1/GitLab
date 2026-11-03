@@ -45,5 +45,5 @@ def analyze_dc(voltage_v, resistance_ohm):
 
 
 if __name__ == "__main__":
-    circuit = series(6, parallel(12, 6))
+    circuit = series(6, parallel(12, 12))
     print(analyze_dc(12, circuit))
