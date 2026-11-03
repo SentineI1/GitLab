@@ -33,6 +33,10 @@ class TestDCAnalyzer(unittest.TestCase):
         with self.assertRaises(ValueError):
             analyze_dc(12, 0)
 
+    def test_negative_resistance_is_rejected(self):
+        with self.assertRaises(ValueError):
+            analyze_dc(12, -5)
+
 
 if __name__ == "__main__":
     unittest.main()
