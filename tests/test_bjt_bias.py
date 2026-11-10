@@ -1,6 +1,6 @@
 import unittest
 
-from bjt_bias import BiasInputError, parse_inputs
+from bjt_bias import BiasInputError, VCE_SAT_V, analyze, parse_inputs
 
 VALID = {
     "vcc": "12",
@@ -75,6 +75,46 @@ class TestParseInputs(unittest.TestCase):
         self.assertGreaterEqual(len(ctx.exception.errors), 2)
         self.assertIn("vcc", ctx.exception.errors)
         self.assertIn("beta", ctx.exception.errors)
+
+
+def make(**overrides):
+    return parse_inputs({**VALID, **overrides})
+
+
+class TestAnalyze(unittest.TestCase):
+    def test_worked_example_is_active(self):
+        result = analyze(make())
+        self.assertEqual(result.region, "active")
+        self.assertIn("active", result.message.lower())
+        self.assertAlmostEqual(result.vbb_v, 2.1052632, delta=1e-6)
+        self.assertAlmostEqual(result.rb_ohm, 8245.614035, delta=1e-3)
+        self.assertAlmostEqual(result.ib_ma, 0.0088245, delta=1e-7)
+        self.assertAlmostEqual(result.ic_ma, 1.3236752, delta=1e-6)
+        self.assertAlmostEqual(result.ie_ma, 1.3324997, delta=1e-6)
+        self.assertAlmostEqual(result.vb_v, 2.0324997, delta=1e-6)
+        self.assertAlmostEqual(result.vc_v, 5.7787265, delta=1e-6)
+        self.assertAlmostEqual(result.ve_v, 1.3324997, delta=1e-6)
+        self.assertAlmostEqual(result.vce_v, 4.4462268, delta=1e-6)
+
+    def test_cutoff_when_vbb_below_vbe(self):
+        result = analyze(make(r1="100000", r2="1000"))
+        self.assertEqual(result.region, "cutoff")
+        self.assertIn("cutoff", result.message.lower())
+        self.assertGreater(result.vce_v, VCE_SAT_V)
+
+    def test_cutoff_boundary_has_zero_current(self):
+        result = analyze(make(vcc="7", r1="9000", r2="1000"))
+        self.assertEqual(result.region, "cutoff")
+        self.assertAlmostEqual(result.ic_ma, 0.0, places=12)
+        self.assertAlmostEqual(result.vce_v, 7.0, places=12)
+
+    def test_saturation_when_vce_below_threshold(self):
+        result = analyze(
+            make(vcc="5", r1="10000", r2="10000", rc="1000", re="100", beta="300")
+        )
+        self.assertEqual(result.region, "saturation")
+        self.assertIn("saturation", result.message.lower())
+        self.assertLess(result.vce_v, VCE_SAT_V)
 
 
 if __name__ == "__main__":
