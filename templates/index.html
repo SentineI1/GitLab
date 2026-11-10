@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BJT Common-Emitter DC Bias Calculator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% set labels = {'vcc': 'VCC', 'r1': 'R1', 'r2': 'R2', 'rc': 'RC',
+                 're': 'RE', 'beta': 'beta', 'vbe': 'VBE'} %}
+<main class="page">
+
+  <header class="page-header">
+    <h1>BJT Common-Emitter DC Bias Calculator</h1>
+    <p class="lede">
+      NPN common-emitter stage: VCC feeds R1 to the base and RC to the
+      collector, R2 runs from base to ground, RE from emitter to ground.
+      Enter the values, submit, and the operating point is solved twice &mdash;
+      once by Thevenin reduction of the base divider, once by a direct
+      base-node KCL equation &mdash; so the two answers can be checked against
+      each other.
+    </p>
+  </header>
+
+  <section class="card">
+    <h2>Circuit values</h2>
+
+    {% if errors %}
+    <div class="error-summary" role="alert">
+      <h3>Fix these before calculating</h3>
+      <ul>
+        {% for field, message in errors.items() %}
+        <li><span class="field-name">{{ labels.get(field, field|upper) }}</span>: {{ message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form class="bias-form" method="post" action="{{ url_for('index') }}">
+      <div class="field">
+        <label for="vcc">VCC <span class="unit">volts</span></label>
+        <input type="text" inputmode="decimal" autocomplete="off" id="vcc" name="vcc" value="{{ values.vcc }}">
+        {% if errors.vcc %}<p class="field-error">{{ errors.vcc }}</p>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="r1">R1 <span class="unit">ohms</span></label>
+        <input type="text" inputmode="decimal" autocomplete="off" id="r1" name="r1" value="{{ values.r1 }}">
+        {% if errors.r1 %}<p class="field-error">{{ errors.r1 }}</p>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="r2">R2 <span class="unit">ohms</span></label>
+        <input type="text" inputmode="decimal" autocomplete="off" id="r2" name="r2" value="{{ values.r2 }}">
+        {% if errors.r2 %}<p class="field-error">{{ errors.r2 }}</p>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="rc">RC <span class="unit">ohms</span></label>
+        <input type="text" inputmode="decimal" autocomplete="off" id="rc" name="rc" value="{{ values.rc }}">
+        {% if errors.rc %}<p class="field-error">{{ errors.rc }}</p>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="re">RE <span class="unit">ohms</span></label>
+        <input type="text" inputmode="decimal" autocomplete="off" id="re" name="re" value="{{ values.re }}">
+        {% if errors.re %}<p class="field-error">{{ errors.re }}</p>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="beta">beta <span class="unit">dimensionless</span></label>
+        <input type="text" inputmode="decimal" autocomplete="off" id="beta" name="beta" value="{{ values.beta }}">
+        {% if errors.beta %}<p class="field-error">{{ errors.beta }}</p>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="vbe">VBE <span class="unit">volts</span></label>
+        <input type="text" inputmode="decimal" autocomplete="off" id="vbe" name="vbe" value="{{ values.vbe }}">
+        {% if errors.vbe %}<p class="field-error">{{ errors.vbe }}</p>{% endif %}
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">Calculate</button>
+      </div>
+    </form>
+  </section>
+
+  {% if result %}
+  <section class="card">
+    <h2>DC Operating Point</h2>
+
+    <p class="region-line">
+      <span class="badge badge-{{ result.region }}">{{ result.region|capitalize }}</span>
+      <span class="region-message">{{ result.message }}</span>
+    </p>
+
+    <table class="results">
+      <thead>
+        <tr>
+          <th scope="col">Quantity</th>
+          <th scope="col">Value</th>
+          <th scope="col">Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">VBB <span class="note">Thevenin voltage of the base divider</span></th>
+          <td>{{ "%.3f"|format(result.vbb_v) }}</td>
+          <td>V</td>
+        </tr>
+        <tr>
+          <th scope="row">RB <span class="note">Thevenin resistance of the base divider</span></th>
+          <td>{{ "%.3f"|format(result.rb_ohm) }}</td>
+          <td>ohm</td>
+        </tr>
+        <tr>
+          <th scope="row">IB <span class="note">base current</span></th>
+          <td>{{ "%.4f"|format(result.ib_ma) }}</td>
+          <td>mA</td>
+        </tr>
+        <tr>
+          <th scope="row">IC <span class="note">collector current</span></th>
+          <td>{{ "%.4f"|format(result.ic_ma) }}</td>
+          <td>mA</td>
+        </tr>
+        <tr>
+          <th scope="row">IE <span class="note">emitter current</span></th>
+          <td>{{ "%.4f"|format(result.ie_ma) }}</td>
+          <td>mA</td>
+        </tr>
+        <tr>
+          <th scope="row">VB <span class="note">base voltage</span></th>
+          <td>{{ "%.3f"|format(result.vb_v) }}</td>
+          <td>V</td>
+        </tr>
+        <tr>
+          <th scope="row">VC <span class="note">collector voltage</span></th>
+          <td>{{ "%.3f"|format(result.vc_v) }}</td>
+          <td>V</td>
+        </tr>
+        <tr>
+          <th scope="row">VE <span class="note">emitter voltage</span></th>
+          <td>{{ "%.3f"|format(result.ve_v) }}</td>
+          <td>V</td>
+        </tr>
+        <tr>
+          <th scope="row">VCE <span class="note">collector-emitter voltage</span></th>
+          <td>{{ "%.3f"|format(result.vce_v) }}</td>
+          <td>V</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+  {% if comparison %}
+  <section class="card">
+    <h2>Cross-check</h2>
+    <p class="lede">
+      Thevenin reduction of the base divider against a direct base-node KCL
+      solve. The two methods share no algebra, so agreement is evidence that
+      the operating point is right.
+    </p>
+
+    <table class="comparison">
+      <thead>
+        <tr>
+          <th scope="col">Quantity</th>
+          <th scope="col">Thevenin</th>
+          <th scope="col">Nodal</th>
+          <th scope="col">Delta</th>
+          <th scope="col">Relative</th>
+          <th scope="col">Match</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">IC <span class="unit">mA</span></th>
+          <td>{{ "%.4f"|format(result.ic_ma) }}</td>
+          <td>{{ "%.4f"|format(independent.ic_ma) }}</td>
+          <td>{{ "%.4f"|format(comparison.ic_delta_ma) }}</td>
+          <td>{{ "%.4f"|format(comparison.ic_relative * 100) }} %</td>
+          <td class="{{ 'match-yes' if comparison.ic_match else 'match-no' }}">
+            {{ 'Match' if comparison.ic_match else 'Mismatch' }}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">VCE <span class="unit">V</span></th>
+          <td>{{ "%.3f"|format(result.vce_v) }}</td>
+          <td>{{ "%.3f"|format(independent.vce_v) }}</td>
+          <td>{{ "%.3f"|format(comparison.vce_delta_v) }}</td>
+          <td>{{ "%.4f"|format(comparison.vce_relative * 100) }} %</td>
+          <td class="{{ 'match-yes' if comparison.vce_match else 'match-no' }}">
+            {{ 'Match' if comparison.vce_match else 'Mismatch' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+  <footer class="page-footer">
+    <p>
+      Currents are shown in mA, voltages in V, resistances in ohm.
+      Currents are displayed to four decimal places and voltages and
+      resistances to three.
+    </p>
+  </footer>
+
+</main>
+</body>
+</html>
