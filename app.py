@@ -13,13 +13,10 @@ template with either errors or results.
 
 from flask import Flask, render_template, request
 
-from bjt_bias import BiasInputError, analyze, parse_inputs
+from bjt_bias import BiasInputError, FIELDS, analyze, parse_inputs
 from independent_check import compare, solve
 
-__all__ = ["DEFAULTS", "FIELDS", "app"]
-
-# The form fields, in the order they appear on the page.
-FIELDS = ("vcc", "r1", "r2", "rc", "re", "beta", "vbe")
+__all__ = ["DEFAULTS", "FIELDS", "app"]  # FIELDS is re-exported from bjt_bias.
 
 # A working example: a 12 V stage biased into the active region.
 DEFAULTS = {

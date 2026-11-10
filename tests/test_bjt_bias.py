@@ -116,6 +116,54 @@ class TestAnalyze(unittest.TestCase):
         self.assertIn("saturation", result.message.lower())
         self.assertLess(result.vce_v, VCE_SAT_V)
 
+    def test_saturation_just_below_vce_sat(self):
+        """A VCE a hair under VCE(sat) is saturation, not deep saturation."""
+        result = analyze(
+            make(vcc="5", r1="10000", r2="10000", rc="212", re="100", beta="300")
+        )
+        self.assertEqual(result.region, "saturation")
+        self.assertIn("saturation", result.message.lower())
+        self.assertLess(result.vce_v, VCE_SAT_V)
+        self.assertAlmostEqual(result.vce_v, 0.19487179487179485, delta=1e-12)
+
+    def test_active_just_above_vce_sat(self):
+        """The same circuit with a slightly smaller RC lands in the active region."""
+        result = analyze(
+            make(vcc="5", r1="10000", r2="10000", rc="210", re="100", beta="300")
+        )
+        self.assertEqual(result.region, "active")
+        self.assertIn("active", result.message.lower())
+        self.assertGreaterEqual(result.vce_v, VCE_SAT_V)
+        self.assertAlmostEqual(result.vce_v, 0.2256410256410255, delta=1e-12)
+
+    def test_active_one_step_above_vce_sat(self):
+        """The closest active case to the threshold is still active."""
+        result = analyze(
+            make(vcc="5", r1="10000", r2="10000", rc="211", re="100", beta="300")
+        )
+        self.assertEqual(result.region, "active")
+        self.assertGreaterEqual(result.vce_v, VCE_SAT_V)
+        self.assertAlmostEqual(result.vce_v, 0.21025641025641018, delta=1e-12)
+
+    def test_vce_exactly_at_vce_sat_is_active(self):
+        """VCE == VCE(sat) exactly is active: the region test is a strict `<`.
+
+        The arithmetic here is exact, so the boundary is hit on the nose:
+        VBB = 2.5 V, RB = 7500 ohm, IB = 1.8/9600 = 0.1875 mA,
+        IC = 3.75 mA, IE = 3.9375 mA, VE = 0.39375 V,
+        VC = 5 - 3.75 mA * 1175 ohm = 0.59375 V,
+        VCE = 0.59375 - 0.39375 = 0.2 V exactly.
+        """
+        result = analyze(
+            make(
+                vcc="5", r1="15000", r2="15000", rc="1175",
+                re="100", beta="20", vbe="0.7",
+            )
+        )
+        self.assertEqual(result.vce_v, VCE_SAT_V)
+        self.assertEqual(result.region, "active")
+        self.assertIn("active", result.message.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

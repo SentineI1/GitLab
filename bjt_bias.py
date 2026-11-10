@@ -16,6 +16,7 @@ __all__ = [
     "BiasInputError",
     "BiasInputs",
     "BiasResult",
+    "FIELDS",
     "VCE_SAT_V",
     "analyze",
     "parse_inputs",

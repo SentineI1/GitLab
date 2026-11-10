@@ -2,7 +2,7 @@
 
 - **Date:** 2026-11-10
 - **Course:** ENG29 2121, Lab 2
-- **Status:** Awaiting approval
+- **Status:** Approved (2026-11-10)
 - **Repo:** `SentineI1/GitLab`, branch `main`
 
 ## Intent
@@ -165,8 +165,9 @@ engineering functions.
 | `IB`, `IC`, `IE` | mA |
 
 Display to four decimal places for currents (so `IB` in the tens of microamps is
-still visible) and three for voltages. The template receives pre-formatted
-strings plus raw values for the delta.
+still visible) and three for voltages. The template receives raw `BiasResult` /
+`IndependentResult` / `Comparison` objects and formats them (`"%.3f"` for
+V/ohm, `"%.4f"` for mA).
 
 ### User interface
 
@@ -207,8 +208,8 @@ docs/superpowers/specs/2026-11-10-bjt-ce-bias-design.md
 With the defaults above, the expected active-region result is approximately:
 
 - `VBB = 2.1053 V`, `RB = 8245.61 ohm`
-- `IB = 0.008825 mA`, `IC = 1.32369 mA`, `IE = 1.33252 mA`
-- `VB = 2.03252 V`, `VC = 5.77866 V`, `VE = 1.33252 V`, `VCE = 4.44614 V`
+- `IB = 0.0088 mA`, `IC = 1.3237 mA`, `IE = 1.3325 mA`
+- `VB = 2.0325 V`, `VC = 5.7787 V`, `VE = 1.3325 V`, `VCE = 4.4462 V`
 - Region: active
 
 Both methods must agree on this case within `1e-6` relative.
@@ -216,8 +217,9 @@ Both methods must agree on this case within `1e-6` relative.
 ### Testing
 
 - `test_bjt_bias.py`: the worked example, an active case, a cutoff case
-  (`VBB <= VBE`), a saturation case (`VCE < 0.2`), each validation rule, and
-  non-numeric/`NaN` input.
+  (`VBB <= VBE`), a saturation case (`VCE < 0.2`), the near-threshold boundary
+  cases (`VCE` just below, just above, and exactly at `0.2 V`), each validation
+  rule, and non-numeric/`NaN` input.
 - `test_independent.py`: both methods agree on a table of active, cutoff, and
   saturation cases, including boundary cases (`VBB == VBE`, and a deep
   saturation case where `VCE` is near zero); delta is within tolerance.
