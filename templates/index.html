@@ -15,7 +15,57 @@
     in the active region, and checks the result with a second method.
   </p>
 
-  <form method="post" action="/">
+  <div class="workspace">
+    <figure class="circuit-panel">
+      <svg class="circuit" viewBox="0 0 420 360" role="img" aria-labelledby="circuit-title">
+        <title id="circuit-title">NPN common-emitter bias circuit: VCC feeds R1 and RC; R2 and RE return to ground.</title>
+        <g class="wire">
+          <path d="M120 30 H295"/>
+          <path d="M120 30 V60"/>
+          <path d="M120 105 V150"/>
+          <path d="M120 150 H250"/>
+          <path d="M120 150 V195"/>
+          <path d="M120 240 V300"/>
+          <path d="M295 30 V35"/>
+          <path d="M295 70 V105"/>
+          <path d="M250 140 L295 105"/>
+          <path d="M250 160 L295 195"/>
+          <path d="M295 195 V210"/>
+          <path d="M295 255 V300"/>
+          <path d="M120 300 H295"/>
+          <path d="M210 300 V312"/>
+          <path d="M200 312 H220"/>
+          <path d="M205 317 H215"/>
+          <path d="M208 322 H212"/>
+        </g>
+        <circle class="node" cx="120" cy="150" r="3.5"/>
+        <line class="component" x1="250" y1="125" x2="250" y2="175"/>
+        <polygon class="node" points="279,183 292,190 283,196"/>
+        <rect class="component" x="112" y="60" width="16" height="45" rx="1"/>
+        <rect class="component" x="112" y="195" width="16" height="45" rx="1"/>
+        <rect class="component" x="287" y="35" width="16" height="35" rx="1"/>
+        <rect class="component" x="287" y="210" width="16" height="45" rx="1"/>
+        <text class="ref" x="120" y="20">VCC</text>
+        <text class="val" x="152" y="20">{{ values.vcc }} V</text>
+        <text class="ref" x="134" y="80">R1</text>
+        <text class="val" x="134" y="96">{{ values.r1 }} ohm</text>
+        <text class="ref" x="134" y="215">R2</text>
+        <text class="val" x="134" y="231">{{ values.r2 }} ohm</text>
+        <text class="ref" x="309" y="48">RC</text>
+        <text class="val" x="309" y="64">{{ values.rc }} ohm</text>
+        <text class="ref" x="309" y="226">RE</text>
+        <text class="val" x="309" y="242">{{ values.re }} ohm</text>
+        <text class="ref" x="302" y="160">Q1</text>
+      </svg>
+      <figcaption class="circuit-caption">
+        <span>beta = {{ values.beta or "—" }} &middot; VBE = {{ values.vbe or "—" }} V</span>
+        {% if result %}
+        <span class="circuit-region badge badge-{{ result.region }}">{{ result.region|capitalize }}</span>
+        {% endif %}
+      </figcaption>
+    </figure>
+
+    <form method="post" action="/">
     <div class="field">
       <label for="vcc">VCC (V)</label>
       <input type="number" step="any" id="vcc" name="vcc" value="{{ values.vcc }}">
@@ -52,7 +102,8 @@
       {% if errors.vbe %}<p class="field-error">{{ errors.vbe }}</p>{% endif %}
     </div>
     <button type="submit">Calculate</button>
-  </form>
+    </form>
+  </div>
 
   {% if result %}
   <section class="results">

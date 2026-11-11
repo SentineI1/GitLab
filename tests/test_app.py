@@ -96,6 +96,50 @@ class TestApp(unittest.TestCase):
         self.assertIn("raw solution", body)
         self.assertIn("nothing is clamped", body)
 
+    def test_circuit_diagram_is_rendered(self):
+        body = self.client.get("/").get_data(as_text=True)
+        self.assertIn('class="circuit"', body)
+        self.assertIn('role="img"', body)
+        self.assertIn("circuit-title", body)
+        for ref in ("VCC", "R1", "R2", "RC", "RE", "Q1"):
+            self.assertIn(ref, body)
+
+    def test_circuit_diagram_shows_default_values(self):
+        body = self.client.get("/").get_data(as_text=True)
+        for text in ("12 V", "47000 ohm", "10000 ohm", "4700 ohm", "1000 ohm"):
+            self.assertIn(text, body)
+
+    def test_circuit_diagram_reflects_submitted_value(self):
+        body = self.client.post("/", data={**DEFAULTS, "vcc": "5"}).get_data(as_text=True)
+        self.assertIn("5 V", body)
+        self.assertNotIn("12 V", body)
+
+    def test_circuit_diagram_shows_region_after_calculation(self):
+        body = self.client.post("/", data=DEFAULTS).get_data(as_text=True)
+        self.assertIn("circuit-region badge badge-active", body)
+
+    def test_circuit_diagram_region_follows_cutoff(self):
+        data = {**DEFAULTS, "r1": "100000", "r2": "1000"}
+        body = self.client.post("/", data=data).get_data(as_text=True)
+        self.assertIn("circuit-region badge badge-cutoff", body)
+
+    def test_circuit_diagram_survives_validation_errors(self):
+        body = self.client.post("/", data={**DEFAULTS, "vcc": "0"}).get_data(as_text=True)
+        self.assertIn('class="circuit"', body)
+        self.assertIn("0 V", body)
+        self.assertNotIn("circuit-region", body)
+
+    def test_circuit_diagram_on_blank_form(self):
+        body = self.client.post("/", data={}).get_data(as_text=True)
+        self.assertIn('class="circuit"', body)
+        self.assertNotIn("circuit-region", body)
+
+    def test_circuit_diagram_handles_huge_values(self):
+        response = self.client.post("/", data={**DEFAULTS, "vcc": "1000000"})
+        body = response.get_data(as_text=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("1000000 V", body)
+
 
 if __name__ == "__main__":
     unittest.main()
