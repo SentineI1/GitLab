@@ -90,6 +90,12 @@ class TestApp(unittest.TestCase):
         body = self.client.post("/", data=DEFAULTS).get_data(as_text=True)
         self.assertIn("badge-active", body)
 
+    def test_raw_solution_note_is_shown(self):
+        data = {**DEFAULTS, "r1": "100000", "r2": "1000"}
+        body = self.client.post("/", data=data).get_data(as_text=True)
+        self.assertIn("raw solution", body)
+        self.assertIn("nothing is clamped", body)
+
 
 if __name__ == "__main__":
     unittest.main()
