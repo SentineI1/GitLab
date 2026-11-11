@@ -151,7 +151,7 @@ Region: **active**. The Thevenin and base-node KCL solves agree exactly here
 app.py                    Flask app and routes only
 bjt_bias.py               validation, Thevenin solve, region classification
 independent_check.py      base-node KCL solve, no shared algebra
-templates/index.html      the single page
+templates/index.html      circuit diagram, form, results, and cross-check
 static/style.css          layout and the region badge colours
 tests/test_bjt_bias.py    model, regions, validation
 tests/test_independent.py agreement across cases
