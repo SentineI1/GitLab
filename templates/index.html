@@ -18,30 +18,37 @@
     <div class="field">
       <label for="vcc">VCC (V)</label>
       <input type="number" step="any" id="vcc" name="vcc" value="{{ values.vcc }}">
+      {% if errors.vcc %}<p class="field-error">{{ errors.vcc }}</p>{% endif %}
     </div>
     <div class="field">
       <label for="r1">R1 (ohm)</label>
       <input type="number" step="any" id="r1" name="r1" value="{{ values.r1 }}">
+      {% if errors.r1 %}<p class="field-error">{{ errors.r1 }}</p>{% endif %}
     </div>
     <div class="field">
       <label for="r2">R2 (ohm)</label>
       <input type="number" step="any" id="r2" name="r2" value="{{ values.r2 }}">
+      {% if errors.r2 %}<p class="field-error">{{ errors.r2 }}</p>{% endif %}
     </div>
     <div class="field">
       <label for="rc">RC (ohm)</label>
       <input type="number" step="any" id="rc" name="rc" value="{{ values.rc }}">
+      {% if errors.rc %}<p class="field-error">{{ errors.rc }}</p>{% endif %}
     </div>
     <div class="field">
       <label for="re">RE (ohm)</label>
       <input type="number" step="any" id="re" name="re" value="{{ values.re }}">
+      {% if errors.re %}<p class="field-error">{{ errors.re }}</p>{% endif %}
     </div>
     <div class="field">
       <label for="beta">beta</label>
       <input type="number" step="any" id="beta" name="beta" value="{{ values.beta }}">
+      {% if errors.beta %}<p class="field-error">{{ errors.beta }}</p>{% endif %}
     </div>
     <div class="field">
       <label for="vbe">VBE (V)</label>
       <input type="number" step="any" id="vbe" name="vbe" value="{{ values.vbe }}">
+      {% if errors.vbe %}<p class="field-error">{{ errors.vbe }}</p>{% endif %}
     </div>
     <button type="submit">Calculate</button>
   </form>

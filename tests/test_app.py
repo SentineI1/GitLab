@@ -51,6 +51,31 @@ class TestApp(unittest.TestCase):
         self.assertIn("DC Operating Point", body)
         self.assertNotIn("nan", body.lower())
 
+    def test_invalid_post_shows_error_and_preserves_values(self):
+        body = self.client.post("/", data={**DEFAULTS, "vcc": "0"}).get_data(as_text=True)
+        self.assertNotIn("DC Operating Point", body)
+        self.assertIn("greater than 0", body)
+        self.assertIn('value="47000"', body)
+
+    def test_blank_form_reports_every_field(self):
+        body = self.client.post("/", data={}).get_data(as_text=True)
+        self.assertEqual(body.count("Enter a value."), 7)
+        self.assertNotIn("DC Operating Point", body)
+
+    def test_vbe_must_be_below_vcc(self):
+        body = self.client.post("/", data={**DEFAULTS, "vbe": "12"}).get_data(as_text=True)
+        self.assertIn("VBE must be less than VCC.", body)
+        self.assertNotIn("DC Operating Point", body)
+
+    def test_overflow_text_is_rejected(self):
+        body = self.client.post("/", data={**DEFAULTS, "r1": "1e400"}).get_data(as_text=True)
+        self.assertIn("Enter a finite number.", body)
+        self.assertNotIn("DC Operating Point", body)
+
+    def test_whitespace_is_accepted(self):
+        body = self.client.post("/", data={**DEFAULTS, "vcc": " 12 "}).get_data(as_text=True)
+        self.assertIn("DC Operating Point", body)
+
 
 if __name__ == "__main__":
     unittest.main()
