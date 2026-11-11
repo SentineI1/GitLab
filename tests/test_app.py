@@ -76,6 +76,20 @@ class TestApp(unittest.TestCase):
         body = self.client.post("/", data={**DEFAULTS, "vcc": " 12 "}).get_data(as_text=True)
         self.assertIn("DC Operating Point", body)
 
+    def test_stylesheet_is_linked(self):
+        body = self.client.get("/").get_data(as_text=True)
+        self.assertIn("style.css", body)
+
+    def test_stylesheet_is_served(self):
+        response = self.client.get("/static/style.css")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("text/css", response.content_type)
+        self.assertIn(".badge", response.get_data(as_text=True))
+
+    def test_region_badge_class_is_present(self):
+        body = self.client.post("/", data=DEFAULTS).get_data(as_text=True)
+        self.assertIn("badge-active", body)
+
 
 if __name__ == "__main__":
     unittest.main()
