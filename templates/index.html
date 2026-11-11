@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BJT Common-Emitter Bias Calculator</title>
+</head>
+<body>
+<main class="container">
+  <h1>BJT Common-Emitter Bias Calculator</h1>
+  <p class="lede">
+    Enter the seven DC bias values of an NPN common-emitter stage. The
+    calculator reports the operating point, warns when the transistor is not
+    in the active region, and checks the result with a second method.
+  </p>
+
+  <form method="post" action="/">
+    <div class="field">
+      <label for="vcc">VCC (V)</label>
+      <input type="number" step="any" id="vcc" name="vcc" value="{{ values.vcc }}">
+    </div>
+    <div class="field">
+      <label for="r1">R1 (ohm)</label>
+      <input type="number" step="any" id="r1" name="r1" value="{{ values.r1 }}">
+    </div>
+    <div class="field">
+      <label for="r2">R2 (ohm)</label>
+      <input type="number" step="any" id="r2" name="r2" value="{{ values.r2 }}">
+    </div>
+    <div class="field">
+      <label for="rc">RC (ohm)</label>
+      <input type="number" step="any" id="rc" name="rc" value="{{ values.rc }}">
+    </div>
+    <div class="field">
+      <label for="re">RE (ohm)</label>
+      <input type="number" step="any" id="re" name="re" value="{{ values.re }}">
+    </div>
+    <div class="field">
+      <label for="beta">beta</label>
+      <input type="number" step="any" id="beta" name="beta" value="{{ values.beta }}">
+    </div>
+    <div class="field">
+      <label for="vbe">VBE (V)</label>
+      <input type="number" step="any" id="vbe" name="vbe" value="{{ values.vbe }}">
+    </div>
+    <button type="submit">Calculate</button>
+  </form>
+
+  {% if result %}
+  <section class="results">
+    <h2>DC Operating Point</h2>
+    <p>
+      <span class="badge badge-{{ result.region }}">{{ result.region|capitalize }}</span>
+    </p>
+    <p class="region-message">{{ result.message }}</p>
+
+    <table>
+      <thead>
+        <tr><th>Quantity</th><th>Value</th><th>Unit</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>VBB</td><td>{{ "%.3f"|format(result.vbb_v) }}</td><td>V</td></tr>
+        <tr><td>RB</td><td>{{ "%.3f"|format(result.rb_ohm) }}</td><td>ohm</td></tr>
+        <tr><td>IB</td><td>{{ "%.4f"|format(result.ib_ma) }}</td><td>mA</td></tr>
+        <tr><td>IC</td><td>{{ "%.4f"|format(result.ic_ma) }}</td><td>mA</td></tr>
+        <tr><td>IE</td><td>{{ "%.4f"|format(result.ie_ma) }}</td><td>mA</td></tr>
+        <tr><td>VB</td><td>{{ "%.3f"|format(result.vb_v) }}</td><td>V</td></tr>
+        <tr><td>VC</td><td>{{ "%.3f"|format(result.vc_v) }}</td><td>V</td></tr>
+        <tr><td>VE</td><td>{{ "%.3f"|format(result.ve_v) }}</td><td>V</td></tr>
+        <tr><td>VCE</td><td>{{ "%.3f"|format(result.vce_v) }}</td><td>V</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  {% if comparison %}
+  <section class="crosscheck">
+    <h2>Cross-check</h2>
+    <p>
+      The same operating point solved twice: the Thevenin reduction of the base
+      divider and a Nodal solve of Kirchhoff's current law at the base node.
+      The two paths share no algebra.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Quantity</th><th>Thevenin</th><th>Nodal</th><th>|delta|</th><th>Relative</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>IC (mA)</td>
+          <td>{{ "%.4f"|format(result.ic_ma) }}</td>
+          <td>{{ "%.4f"|format(independent.ic_ma) }}</td>
+          <td>{{ "%.3e"|format(comparison.ic_delta_ma) }}</td>
+          <td>{{ "%.3e"|format(comparison.ic_relative) }}</td>
+        </tr>
+        <tr>
+          <td>VCE (V)</td>
+          <td>{{ "%.3f"|format(result.vce_v) }}</td>
+          <td>{{ "%.3f"|format(independent.vce_v) }}</td>
+          <td>{{ "%.3e"|format(comparison.vce_delta_v) }}</td>
+          <td>{{ "%.3e"|format(comparison.vce_relative) }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="match">
+      {% if comparison.ic_match and comparison.vce_match %}
+      The two methods agree.
+      {% else %}
+      The two methods disagree.
+      {% endif %}
+    </p>
+  </section>
+  {% endif %}
+  {% endif %}
+</main>
+</body>
+</html>
