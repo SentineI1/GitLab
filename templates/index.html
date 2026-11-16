@@ -89,7 +89,7 @@
         <text class="val" x="309" y="64">{{ values.rc }} ohm</text>
         <text class="ref" x="302" y="160">Q1</text>
       </svg>
-      {% else %}
+      {% elif values.mode == "emitter" %}
       <svg class="circuit" viewBox="0 0 420 360" role="img" aria-labelledby="circuit-title">
         <title id="circuit-title">NPN common-emitter emitter-bias circuit: VCC feeds RB to the base and RC to the collector; RE returns the emitter to ground.</title>
         <g class="wire">
