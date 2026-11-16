@@ -32,6 +32,47 @@ MOSFET support; no database, login, or history.
 ground; `RE` runs from emitter to ground. The transistor is modelled as a fixed
 `VBE` drop and `IC = beta * IB`, which is valid in the active region.
 
+## Bias modes
+
+Pick the network in the **Bias mode** selector. Only that mode's fields are
+required; the others are ignored, so switching modes keeps the values you
+already typed.
+
+| Mode | Network | Fields used |
+| ---- | ------- | ----------- |
+| Voltage-divider bias | R1/R2 base divider, RC, RE | VCC, R1, R2, RC, RE, beta, VBE |
+| Fixed bias | RB from VCC to base, RC to collector, emitter grounded | VCC, RB, RC, beta, VBE |
+| Emitter bias | RB from VCC to base, RE to ground, RC to collector | VCC, RB, RC, RE, beta, VBE |
+
+Fixed bias:
+
+```
+IB  = (VCC - VBE) / RB
+IC  = beta * IB
+IE  = (1 + beta) * IB
+VE  = 0
+VB  = VBE
+VC  = VCC - IC * RC
+VCE = VC - VE
+```
+
+Emitter bias:
+
+```
+IB  = (VCC - VBE) / (RB + (1 + beta) * RE)
+IC  = beta * IB
+IE  = (1 + beta) * IB
+VE  = IE * RE
+VB  = VE + VBE
+VC  = VCC - IC * RC
+VCE = VC - VE
+```
+
+The divider keeps the Thevenin solve described below. Every mode returns the
+same keys — `ib_ma`, `ic_ma`, `ie_ma` in mA; `vb_v`, `vc_v`, `ve_v`, `vce_v`
+in V; plus `region` and `message` — so one results table serves all three.
+The divider also reports `vbb_v` and `rb_ohm`.
+
 ## Inputs
 
 All seven fields are required. Values are parsed as finite numbers; blank,
@@ -149,6 +190,7 @@ Region: **active**. The Thevenin and base-node KCL solves agree exactly here
 
 ```
 app.py                    Flask app and routes only
+bias_modes.py             mode list, per-mode validation, three solvers
 bjt_bias.py               validation, Thevenin solve, region classification
 independent_check.py      base-node KCL solve, no shared algebra
 templates/index.html      circuit diagram, form, results, and cross-check

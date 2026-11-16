@@ -39,6 +39,7 @@ h2 { margin-top: 2rem; font-size: 1.15rem; }
 
 @media (min-width: 760px) {
   .workspace { grid-template-columns: 1fr 1fr; }
+  .workspace-single { grid-template-columns: 1fr; }
 }
 
 .circuit-panel {
@@ -78,13 +79,16 @@ form {
 }
 
 .field { display: flex; flex-direction: column; gap: .25rem; }
+.field-wide { grid-column: 1 / -1; }
 label { font-size: .85rem; color: var(--muted); }
 
-input {
+input,
+select {
   padding: .45rem .55rem;
   border: 1px solid var(--line);
   border-radius: 6px;
   font: inherit;
+  background: #fff;
 }
 
 button {

@@ -10,12 +10,14 @@
 <main class="container">
   <h1>BJT Common-Emitter Bias Calculator</h1>
   <p class="lede">
-    Enter the seven DC bias values of an NPN common-emitter stage. The
-    calculator reports the operating point, warns when the transistor is not
-    in the active region, and checks the result with a second method.
+    Enter the DC bias values of an NPN common-emitter stage and pick the bias
+    network. The calculator reports the operating point, warns when the
+    transistor is not in the active region, and (for the divider) checks the
+    result with a second method.
   </p>
 
-  <div class="workspace">
+  <div class="workspace{% if values.mode != 'divider' %} workspace-single{% endif %}">
+    {% if values.mode == "divider" %}
     <figure class="circuit-panel">
       <svg class="circuit" viewBox="0 0 420 360" role="img" aria-labelledby="circuit-title">
         <title id="circuit-title">NPN common-emitter bias circuit: VCC feeds R1 and RC; R2 and RE return to ground.</title>
@@ -64,22 +66,36 @@
         {% endif %}
       </figcaption>
     </figure>
+    {% endif %}
 
     <form method="post" action="/">
+    <div class="field field-wide">
+      <label for="mode">Bias mode</label>
+      <select id="mode" name="mode">
+        {% for value, label in mode_labels.items() %}
+        <option value="{{ value }}"{% if values.mode == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <div class="field">
       <label for="vcc">VCC (V)</label>
       <input type="number" step="any" id="vcc" name="vcc" value="{{ values.vcc }}">
       {% if errors.vcc %}<p class="field-error">{{ errors.vcc }}</p>{% endif %}
     </div>
     <div class="field">
-      <label for="r1">R1 (ohm)</label>
+      <label for="r1">R1 (ohm) &middot; divider</label>
       <input type="number" step="any" id="r1" name="r1" value="{{ values.r1 }}">
       {% if errors.r1 %}<p class="field-error">{{ errors.r1 }}</p>{% endif %}
     </div>
     <div class="field">
-      <label for="r2">R2 (ohm)</label>
+      <label for="r2">R2 (ohm) &middot; divider</label>
       <input type="number" step="any" id="r2" name="r2" value="{{ values.r2 }}">
       {% if errors.r2 %}<p class="field-error">{{ errors.r2 }}</p>{% endif %}
+    </div>
+    <div class="field">
+      <label for="rb">RB (ohm) &middot; fixed / emitter</label>
+      <input type="number" step="any" id="rb" name="rb" value="{{ values.rb }}">
+      {% if errors.rb %}<p class="field-error">{{ errors.rb }}</p>{% endif %}
     </div>
     <div class="field">
       <label for="rc">RC (ohm)</label>
@@ -87,7 +103,7 @@
       {% if errors.rc %}<p class="field-error">{{ errors.rc }}</p>{% endif %}
     </div>
     <div class="field">
-      <label for="re">RE (ohm)</label>
+      <label for="re">RE (ohm) &middot; divider / emitter</label>
       <input type="number" step="any" id="re" name="re" value="{{ values.re }}">
       {% if errors.re %}<p class="field-error">{{ errors.re }}</p>{% endif %}
     </div>
@@ -107,7 +123,7 @@
 
   {% if result %}
   <section class="results">
-    <h2>DC Operating Point</h2>
+    <h2>DC Operating Point &middot; {{ mode_labels[result.mode] }}</h2>
     <p>
       <span class="badge badge-{{ result.region }}">{{ result.region|capitalize }}</span>
     </p>
@@ -118,8 +134,12 @@
         <tr><th>Quantity</th><th>Value</th><th>Unit</th></tr>
       </thead>
       <tbody>
+        {% if result.vbb_v is defined %}
         <tr><td>VBB</td><td>{{ "%.3f"|format(result.vbb_v) }}</td><td>V</td></tr>
+        {% endif %}
+        {% if result.rb_ohm is defined %}
         <tr><td>RB</td><td>{{ "%.3f"|format(result.rb_ohm) }}</td><td>ohm</td></tr>
+        {% endif %}
         <tr><td>IB</td><td>{{ "%.4f"|format(result.ib_ma) }}</td><td>mA</td></tr>
         <tr><td>IC</td><td>{{ "%.4f"|format(result.ic_ma) }}</td><td>mA</td></tr>
         <tr><td>IE</td><td>{{ "%.4f"|format(result.ie_ma) }}</td><td>mA</td></tr>
