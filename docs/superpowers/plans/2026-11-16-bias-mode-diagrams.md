@@ -37,7 +37,7 @@
 - Consumes: `values.mode`, `values.vcc`, `values.rb`, `values.rc`, `values.re`, `values.beta`, `values.vbe`, `result`.
 - Produces: one `<figure class="circuit-panel">` whose SVG matches the selected mode; `class="circuit"`, `role="img"`, `id="circuit-title"`, `class="circuit-region badge badge-<region>"` preserved.
 
-- [ ] **Step 1: Replace the divider-only figure with the three-branch figure**
+- [x] **Step 1: Replace the divider-only figure with the three-branch figure**
 
 Change `<div class="workspace{% if values.mode != 'divider' %} workspace-single{% endif %}">` to `<div class="workspace">`.
 
@@ -79,7 +79,7 @@ Fixed-bias SVG:
 
 Emitter-bias SVG: the same markup with these three changes — insert `<path d="M295 195 V210"/>` before the emitter drop, add `<rect class="component" x="287" y="210" width="16" height="45" rx="1"/>` after the RC rect, change the emitter drop to `<path d="M295 255 V312"/>`, add `<text class="ref" x="309" y="226">RE</text>` and `<text class="val" x="309" y="242">{{ values.re }} ohm</text>`, and use the title `NPN common-emitter emitter-bias circuit: VCC feeds RB to the base and RC to the collector; RE returns the emitter to ground.`
 
-- [ ] **Step 2: Check the rendered markup per mode**
+- [x] **Step 2: Check the rendered markup per mode**
 
 Run the existing app with `.\\.venv\\Scripts\\python.exe -m flask --app app run --port 5000` (restart it if already running) and POST each mode. Expected in the response body:
 
@@ -100,24 +100,24 @@ Run the existing app with `.\\.venv\\Scripts\\python.exe -m flask --app app run 
 - Consumes: Task 1's always-two-column workspace.
 - Produces: no unused `.workspace-single` rule; README describes the three drawings.
 
-- [ ] **Step 1: Remove the unused single-column rule**
+- [x] **Step 1: Remove the unused single-column rule**
 
 Delete `.workspace-single { grid-template-columns: 1fr; }` from the `@media (min-width: 760px)` block, leaving only `.workspace { grid-template-columns: 1fr 1fr; }`.
 
-- [ ] **Step 2: Describe the drawings in the README**
+- [x] **Step 2: Describe the drawings in the README**
 
 After the divider circuit block, add: the fixed-bias drawing shows `RB` from `VCC` to the base, `RC` to the collector, and a grounded emitter; the emitter-bias drawing adds `RE` between emitter and ground. The drawing follows the selected mode and shows the values currently in the form.
 
-- [ ] **Step 3: Run the existing suite**
+- [x] **Step 3: Run the existing suite**
 
 Run: `.\\.venv\\Scripts\\python.exe -m unittest discover -s tests -t .`
 Expected: `Ran 43 tests ... OK`.
 
-- [ ] **Step 4: Browser pass for all three modes**
+- [x] **Step 4: Browser pass for all three modes**
 
 Restart the server, then confirm for each mode: the drawing changes with the selector, labels show the submitted values, the region badge appears only after a calculation, and the divider drawing is unchanged from before. Also confirm a blank POST in each mode still renders a drawing with no badge.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add templates/index.html static/style.css README.md docs/superpowers/specs/2026-11-16-bias-mode-diagrams-design.md docs/superpowers/plans/2026-11-16-bias-mode-diagrams.md
