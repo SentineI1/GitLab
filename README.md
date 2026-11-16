@@ -32,6 +32,11 @@ MOSFET support; no database, login, or history.
 ground; `RE` runs from emitter to ground. The transistor is modelled as a fixed
 `VBE` drop and `IC = beta * IB`, which is valid in the active region.
 
+The drawing beside the form follows the selected mode. Fixed bias shows `RB`
+from `VCC` to the base, `RC` to the collector, and a grounded emitter; emitter
+bias adds `RE` between emitter and ground. Labels show the values currently in
+the form.
+
 ## Bias modes
 
 Pick the network in the **Bias mode** selector. Only that mode's fields are

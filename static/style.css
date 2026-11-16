@@ -39,7 +39,6 @@ h2 { margin-top: 2rem; font-size: 1.15rem; }
 
 @media (min-width: 760px) {
   .workspace { grid-template-columns: 1fr 1fr; }
-  .workspace-single { grid-template-columns: 1fr; }
 }
 
 .circuit-panel {
