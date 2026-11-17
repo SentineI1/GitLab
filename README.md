@@ -153,6 +153,19 @@ runtime dependency.
 Then open <http://127.0.0.1:5000>. The form arrives prefilled with the worked
 example below, so the first page load is already demonstrable.
 
+## Lab 3 browser acceptance
+
+The three bias modes were checked in a real browser with Playwright MCP
+(`npx -y @playwright/mcp@latest --browser chrome --isolated`), using the
+student-provided A1–A5 cases and tolerance. Results, independent reference
+calculations, tool names, and browser evidence are recorded in
+[`docs/validation.md`](docs/validation.md), with a screenshot at
+[`docs/evidence/A5-fixed-rb0.png`](docs/evidence/A5-fixed-rb0.png).
+
+Repository: <https://github.com/SentineI1/GitLab>. The Lab 3 feature commits
+are `ac59a8b`, `cebf0e1`, and `9ca9343`; the submission commit is reported by
+`git log -1` after push.
+
 ## Test
 
 ```powershell
@@ -204,6 +217,8 @@ tests/test_bjt_bias.py    model, regions, validation
 tests/test_independent.py agreement across cases
 tests/test_app.py         GET, valid POST, invalid POST, styling
 requirements.txt          Flask 3.x
+docs/validation.md        A1–A5 browser results, references, evidence
+docs/evidence/            screenshot from the browser check
 ```
 
 ## Design notes
