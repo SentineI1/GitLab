@@ -10,13 +10,16 @@ from __future__ import annotations
 
 import base64
 import io
+import logging
 
 import matplotlib
 
 matplotlib.use("Agg")
 from matplotlib import pyplot as plt  # noqa: E402  (Agg must be selected first)
 
-__all__ = ["ac_plot", "tran_plot"]
+__all__ = ["ac_plot", "tran_plot", "tran_window"]
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def _as_uri(fig) -> str:
@@ -72,20 +75,40 @@ def ac_plot(data: dict) -> str | None:
         fig.tight_layout()
         return _as_uri(fig)
     except Exception:
+        _LOGGER.exception("could not render SPICE plot")
         if fig is not None:
             plt.close(fig)
         return None
+
+
+def tran_window(data: dict) -> dict:
+    """Select the first five source periods of real samples (no fabrication)."""
+    times = data["time_s"]
+    count = len(times)
+    frequency = data.get("frequency_hz")
+    if frequency and frequency > 0:
+        limit = 5.0 / float(frequency)
+        end = next((i for i, value in enumerate(times) if value > limit), count)
+        end = max(1, min(end, count))
+    else:
+        end = count
+    return {
+        "time_s": times[:end],
+        "vin_v": data["vin_v"][:end],
+        "vout_v": data["vout_v"][:end],
+    }
 
 
 def tran_plot(data: dict) -> str | None:
     """Input and output waveforms versus time from the real transient samples."""
     fig = None
     try:
-        time_ms = [seconds * 1000.0 for seconds in data["time_s"]]
+        window = tran_window(data)
+        time_ms = [seconds * 1000.0 for seconds in window["time_s"]]
         fig, ax = plt.subplots(figsize=(8, 4))
-        ax.plot(time_ms, data["vin_v"], color="#5b6570",
+        ax.plot(time_ms, window["vin_v"], color="#5b6570",
                 label="ngspice: V(input), source side of Cin")
-        ax.plot(time_ms, data["vout_v"], color="#1f6feb",
+        ax.plot(time_ms, window["vout_v"], color="#1f6feb",
                 label="ngspice: V(output), across RL")
         ax.set_xlabel("Time (ms)")
         ax.set_ylabel("Voltage (V)")
@@ -95,6 +118,7 @@ def tran_plot(data: dict) -> str | None:
         fig.tight_layout()
         return _as_uri(fig)
     except Exception:
+        _LOGGER.exception("could not render SPICE plot")
         if fig is not None:
             plt.close(fig)
         return None

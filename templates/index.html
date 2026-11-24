@@ -242,7 +242,7 @@
 
   {% if comparison %}
   <section class="crosscheck">
-    <h2>Cross-check</h2>
+    <h2>{% if sim %}Analytical reference &middot; {% endif %}Cross-check</h2>
     <p>
       The same operating point solved twice: the Thevenin reduction of the base
       divider and a Nodal solve of Kirchhoff's current law at the base node.
@@ -283,7 +283,7 @@
   <section class="simulation">
     <h2>SPICE simulation &middot; ngspice</h2>
     <p>
-      <span class="badge badge-{{ 'active' if sim.status == 'success' else 'saturation' }}">
+      <span class="badge badge-{{ 'active' if sim.status == 'success' else 'error' }}">
         {{ 'Simulation complete' if sim.status == 'success' else 'Simulation error' }}
       </span>
       <span class="analysis-name">{{ analysis_labels[analysis] }}</span>

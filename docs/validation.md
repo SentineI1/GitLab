@@ -70,7 +70,7 @@ Four separate `.print ac` lines: `vdb(output)`, `vp(output)`, `vdb(base)`,
 | Gain reference | `V(output) / V(base)` (Vin after Cin) |
 
 `vp()` values in this batch build are radians; the difference is converted to
-degrees in Python and wrapped to (−180°, 180°]. The cutoff is the −3 dB point
+degrees in Python and wrapped to [−180°, 180°). The cutoff is the −3 dB point
 relative to the sweep maximum and is interpolated in log-frequency only when a
 real crossing exists. The upper crossing was absent in this sweep, so the page
 shows the literal text above rather than a made-up number.
@@ -87,8 +87,15 @@ Commands: `.tran 10u 5m 0 10u`, `.print tran v(input) v(output)`.
 | Peak |V(input)| | 0.009998452 V |
 | Peak |V(output)| | 0.01758797 V |
 
-Vin is the source side of `Cin`, Vout is across `RL`. The step is shortened for
-frequencies above 1 kHz so roughly 20 samples per period are retained.
+Vin is the source side of `Cin`, Vout is across `RL`. At the 1 kHz baseline the
+5 ms window is exactly five periods, so all 508 real samples are plotted. Above
+1 kHz both the stop and the step shrink to keep five periods (~100 samples per
+period) and the plot shows only that five-period window of real samples.
+
+A post-review responsiveness check ran the transient analysis at higher
+frequencies: 10 kHz (`.tran 5e-06 0.0005 0 5e-06`), 1 MHz
+(`.tran 5e-08 5e-06 0 5e-08`) and 1 GHz (`.tran 5e-11 5e-09 0 5e-11`) each
+produced 108 real samples and a PNG in roughly 0.1 s.
 
 ### Paginated-table regression
 
@@ -139,6 +146,12 @@ data URIs, and the error states.
 
 ## Test suite
 
+The suite also pins the engine gates called out in review: nonzero exit codes,
+`Error:`/`Fatal error:`/`aborted` text, timeouts, missing table rows, an
+unexpected `analysis` value, zero/non-numeric frequency, the visible engine
+error detail with a broken `NGSPICE_PATH`, the literal cutoff text in rendered
+HTML, and emitter mode ignoring `simulate`.
+
 Final command and result:
 
 ```powershell
@@ -146,6 +159,6 @@ Final command and result:
 ```
 
 ```
-Ran 56 tests in 0.632s
+Ran 68 tests in 0.948s
 OK
 ```

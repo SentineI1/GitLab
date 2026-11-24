@@ -1,6 +1,9 @@
+import os
 import unittest
+from unittest.mock import patch
 
 from app import DEFAULTS, app
+from spice_engine import SimulationError, resolve_ngspice
 
 
 class TestApp(unittest.TestCase):
@@ -150,7 +153,15 @@ class TestSimulation(unittest.TestCase):
     def setUp(self):
         self.client = app.test_client()
 
+    @staticmethod
+    def require_ngspice():
+        try:
+            resolve_ngspice()
+        except SimulationError as exc:
+            raise unittest.SkipTest(f"ngspice not available: {exc}") from exc
+
     def test_simulate_dc_shows_spice_and_analytical_labels(self):
+        self.require_ngspice()
         r = self.client.post("/", data={**DIVIDER, "action": "simulate", "analysis": "dc"})
         body = r.get_data(as_text=True)
         self.assertIn("SPICE", body)
@@ -165,16 +176,56 @@ class TestSimulation(unittest.TestCase):
         self.assertIn("Amplitude", body)
         self.assertNotIn("Simulation complete", body)
 
+    def test_simulate_rejects_zero_frequency(self):
+        r = self.client.post("/", data={**DIVIDER, "action": "simulate",
+                                        "analysis": "tran", "frequency_hz": "0"})
+        body = r.get_data(as_text=True)
+        self.assertIn("Frequency must be greater than 0.", body)
+        self.assertNotIn("Simulation complete", body)
+
+    def test_simulate_rejects_non_numeric_frequency(self):
+        r = self.client.post("/", data={**DIVIDER, "action": "simulate",
+                                        "analysis": "ac", "frequency_hz": "abc"})
+        body = r.get_data(as_text=True)
+        self.assertIn("Enter a finite number.", body)
+        self.assertNotIn("Simulation complete", body)
+
+    def test_simulate_rejects_tampered_analysis(self):
+        r = self.client.post("/", data={**DIVIDER, "action": "simulate",
+                                        "analysis": "bogus"})
+        body = r.get_data(as_text=True)
+        self.assertIn("Choose DC, AC, or Transient.", body)
+        self.assertNotIn("Simulation complete", body)
+
+    def test_bad_engine_path_shows_error_and_detail(self):
+        with patch.dict(os.environ, {"NGSPICE_PATH": r"C:\nope\ngspice.exe"}):
+            r = self.client.post("/", data={**DIVIDER, "action": "simulate",
+                                            "analysis": "dc"})
+        body = r.get_data(as_text=True)
+        self.assertIn("Simulation error", body)
+        self.assertIn(r"C:\nope", body)
+        self.assertIn('class="engine-detail"', body)
+        self.assertNotIn("data:image/png;base64,", body)
+
     def test_simulate_ac_renders_real_plot_data_uri(self):
+        self.require_ngspice()
         r = self.client.post("/", data={**DIVIDER, "action": "simulate", "analysis": "ac"})
         body = r.get_data(as_text=True)
         self.assertIn("data:image/png;base64,", body)
         self.assertIn("Frequency (Hz)", body)
+        self.assertIn("not determined in sweep range", body)
 
     def test_fixed_mode_ignores_simulate_action(self):
         r = self.client.post("/", data={**FIXED, "action": "simulate", "analysis": "ac"})
         body = r.get_data(as_text=True)
         self.assertIn("Fixed bias", body)
+        self.assertNotIn("SPICE output", body)
+
+    def test_emitter_mode_ignores_simulate_action(self):
+        r = self.client.post("/", data={**DEFAULTS, "mode": "emitter",
+                                        "action": "simulate", "analysis": "tran"})
+        body = r.get_data(as_text=True)
+        self.assertIn("Emitter bias", body)
         self.assertNotIn("SPICE output", body)
 
 

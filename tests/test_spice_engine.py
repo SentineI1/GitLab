@@ -1,4 +1,5 @@
 import os
+import subprocess
 import unittest
 from unittest.mock import patch
 
@@ -13,6 +14,7 @@ from spice_engine import (
     parse_table,
     parse_tran,
     resolve_ngspice,
+    run,
     simulate,
 )
 
@@ -57,6 +59,10 @@ class TestNetlist(unittest.TestCase):
         self.assertIn(".op", build_netlist("dc", VALUES))
         self.assertIn(".tran 10u 5m 0 10u", build_netlist("tran", VALUES))
 
+    def test_tran_netlist_scales_stop_to_five_periods(self):
+        nl = build_netlist("tran", {**VALUES, "frequency_hz": 10_000.0})
+        self.assertIn(".tran 5e-06 0.0005 0 5e-06", nl)
+
 
 class TestEngineErrors(unittest.TestCase):
     def test_check_run_rejects_error_text_with_zero_exit(self):
@@ -64,11 +70,36 @@ class TestEngineErrors(unittest.TestCase):
         with self.assertRaises(SimulationError):
             check_run(result)
 
+    def test_check_run_rejects_fatal_text_and_nonzero_exit(self):
+        for text in ("Fatal error: model not found", "run simulation(s) aborted"):
+            with self.subTest(text=text), self.assertRaises(SimulationError):
+                check_run(RunResult("dc", "", text, 0, "fake"))
+        with self.assertRaises(SimulationError) as cm:
+            check_run(RunResult("dc", "", "", 2, "fake"))
+        self.assertIn("code 2", str(cm.exception))
+
+    def test_run_reports_timeout(self):
+        with patch("spice_engine.subprocess.run",
+                   side_effect=subprocess.TimeoutExpired(["ngspice"], 5)):
+            with self.assertRaises(SimulationError) as cm:
+                run("dc", VALUES, exe="fake")
+        self.assertIn("timed out", str(cm.exception))
+
     def test_resolve_ngspice_reports_bad_env(self):
         with patch.dict(os.environ, {"NGSPICE_PATH": r"C:\does\not\exist\ngspice.exe"}):
             with self.assertRaises(SimulationError) as cm:
                 resolve_ngspice()
         self.assertIn(r"does\not\exist", str(cm.exception))
+
+    def test_resolve_ngspice_ignores_plain_ngspice_from_path(self):
+        with patch.dict(os.environ, {}, clear=True), \
+             patch("spice_engine.os.path.isfile", return_value=False), \
+             patch("spice_engine.shutil.which",
+                   side_effect=lambda name: r"C:\fake\ngspice.exe" if name == "ngspice" else None):
+            with self.assertRaises(SimulationError) as cm:
+                resolve_ngspice()
+        self.assertNotIn("ngspice.exe", str(cm.exception))
+        self.assertNotIn("ngspice.exe", cm.exception.detail)
 
 
 class TestParsers(unittest.TestCase):
@@ -91,6 +122,16 @@ class TestParsers(unittest.TestCase):
         )
         rows = parse_table(text, "vdb(output)")
         self.assertEqual([row[0] for row in rows], [0.0, 1.0, 2.0])
+
+    def test_parse_table_rejects_missing_rows(self):
+        text = (
+            "Index   frequency       vdb(output)\n"
+            "--------------------------------------------------------------------------------\n"
+            "0\t1.000000e+00\t-4.23572e+01\t\n"
+            "2\t1.258925e+00\t-4.03390e+01\t\n"
+        )
+        with self.assertRaises(SimulationError):
+            parse_table(text, "vdb(output)")
 
     def test_parse_op_reads_ngspice_table(self):
         data = parse_op(OP_TEXT)
@@ -148,6 +189,8 @@ class TestRealNgspice(unittest.TestCase):
                 else:
                     key = "frequency_hz" if analysis == "ac" else "time_s"
                     self.assertGreater(len(result["data"][key]), 0)
+                    if analysis == "tran":
+                        self.assertAlmostEqual(result["data"]["frequency_hz"], 1_000.0)
 
 
 if __name__ == "__main__":

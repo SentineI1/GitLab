@@ -169,7 +169,7 @@ expected to match digit-for-digit.
 | -------- | --------------- | ------- |
 | DC | `.op` | VB, VE, VC, VCE and IC at the operating point |
 | AC | `.ac dec 20 1 10Meg` | 141-point log sweep; gain is `20 log10 |V(output)/V(base)|` (Vin measured at the base after Cin), phase is the difference in degrees |
-| Transient | `.tran 10u 5m 0 10u` | Vin at the source side of Cin and Vout across RL; step shortened at higher frequencies |
+| Transient | `.tran 10u 5m 0 10u` at 1 kHz | Vin at the source side of Cin and Vout across RL; at higher frequencies the five-period stop and step both shrink, and the plot shows the first five periods of real samples |
 
 A −3 dB cutoff is reported only when the real sweep crosses it; otherwise the
 page shows the literal text `not determined in sweep range`. Node names in the
@@ -211,10 +211,11 @@ example below, so the first page load is already demonstrable.
 .\.venv\Scripts\python.exe -m unittest discover -s tests -t . -v
 ```
 
-56 tests: the original Lab 3 model/region/cross-check/web cases, the ngspice
-netlist/parser/error-path cases (including three real engine runs), and the
-four SPICE web cases. The real-engine test skips itself if no ngspice binary is
-available.
+68 tests: the original Lab 3 model/region/cross-check/web cases, the ngspice
+netlist/parser/error-gate cases (including three real engine runs), the plot
+window/PNG cases, and the SPICE web cases. The engine-dependent tests skip
+themselves if no ngspice binary is available; the other SPICE form/error tests
+still run.
 
 ## Worked example
 

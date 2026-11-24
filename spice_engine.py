@@ -86,10 +86,12 @@ def resolve_ngspice() -> str:
             "Set NGSPICE_PATH to the ngspice_con.exe executable or leave it unset.",
         )
 
+    # Only the console build is usable here: ngspice.exe is silent in this
+    # environment, so it must never be picked up as a fallback.
     candidates = [
         str(_REPO_BINARY),
         shutil.which("ngspice_con.exe") or "",
-        shutil.which("ngspice") or "",
+        shutil.which("ngspice_con") or "",
     ]
     for candidate in candidates:
         if candidate and os.path.isfile(candidate):
@@ -146,9 +148,16 @@ def build_netlist(analysis: str, values: Mapping[str, float]) -> str:
             ".print ac vp(base)",
         ]
     else:
-        step = "10u" if frequency <= 1000 else _num(max(1e-9, 1.0 / (frequency * 20)))
+        # 1 kHz keeps the documented 5 ms / 10 us baseline. Higher frequencies
+        # keep the same five-period window, scaled down so one request stays
+        # responsive (100 samples per period).
+        if frequency <= 1000:
+            step, stop = "10u", "5m"
+        else:
+            stop_value = 5.0 / frequency
+            step, stop = _num(stop_value / 100.0), _num(stop_value)
         lines += [
-            f".tran {step} 5m 0 {step}",
+            f".tran {step} {stop} 0 {step}",
             ".print tran v(input) v(output)",
         ]
 
@@ -218,6 +227,10 @@ def parse_table(text: str, marker: str) -> list[list[float]]:
             break
     if not rows:
         raise SimulationError(f"ngspice table {marker!r} is empty", _excerpt(text))
+    # An unexpected banner could make the loop break early. Never present a
+    # short read as a complete table.
+    if any(index != float(i) for i, index in enumerate(row[0] for row in rows)):
+        raise SimulationError(f"ngspice table {marker!r} has missing rows", _excerpt(text))
     return rows
 
 
@@ -326,7 +339,9 @@ def simulate(
     result = run(analysis, values, exe=exe, timeout=timeout)
     check_run(result)
     parsers = {"dc": parse_op, "ac": parse_ac, "tran": parse_tran}
-    data = parsers[analysis](result.stdout)
+    data = dict(parsers[analysis](result.stdout))
+    if analysis == "tran":
+        data["frequency_hz"] = float(values["frequency_hz"])
     return {
         "status": "success",
         "analysis": analysis,
