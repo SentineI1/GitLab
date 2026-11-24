@@ -141,6 +141,15 @@
         {% endfor %}
       </select>
     </div>
+    <div class="field field-wide">
+      <label for="analysis">SPICE analysis &middot; divider mode only</label>
+      <select id="analysis" name="analysis">
+        {% for value, label in analysis_labels.items() %}
+        <option value="{{ value }}"{% if values.analysis == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      {% if errors.analysis %}<p class="field-error">{{ errors.analysis }}</p>{% endif %}
+    </div>
     <div class="field">
       <label for="vcc">VCC (V)</label>
       <input type="number" step="any" id="vcc" name="vcc" value="{{ values.vcc }}">
@@ -181,13 +190,26 @@
       <input type="number" step="any" id="vbe" name="vbe" value="{{ values.vbe }}">
       {% if errors.vbe %}<p class="field-error">{{ errors.vbe }}</p>{% endif %}
     </div>
-    <button type="submit">Calculate</button>
+    <div class="field">
+      <label for="amplitude_mv">Source amplitude (mV peak)</label>
+      <input type="number" step="any" id="amplitude_mv" name="amplitude_mv" value="{{ values.amplitude_mv }}">
+      {% if errors.amplitude_mv %}<p class="field-error">{{ errors.amplitude_mv }}</p>{% endif %}
+    </div>
+    <div class="field">
+      <label for="frequency_hz">Source frequency (Hz)</label>
+      <input type="number" step="any" id="frequency_hz" name="frequency_hz" value="{{ values.frequency_hz }}">
+      {% if errors.frequency_hz %}<p class="field-error">{{ errors.frequency_hz }}</p>{% endif %}
+    </div>
+    <div class="button-row">
+      <button type="submit" name="action" value="calculate">Calculate</button>
+      <button type="submit" name="action" value="simulate" class="secondary">Run Simulation</button>
+    </div>
     </form>
   </div>
 
   {% if result %}
   <section class="results">
-    <h2>DC Operating Point &middot; {{ mode_labels[result.mode] }}</h2>
+    <h2>{% if sim %}Analytical reference &middot; {% endif %}DC Operating Point &middot; {{ mode_labels[result.mode] }}</h2>
     <p>
       <span class="badge badge-{{ result.region }}">{{ result.region|capitalize }}</span>
     </p>
@@ -253,6 +275,98 @@
       {% else %}
       The two methods disagree.
       {% endif %}
+    </p>
+  </section>
+  {% endif %}
+
+  {% if sim %}
+  <section class="simulation">
+    <h2>SPICE simulation &middot; ngspice</h2>
+    <p>
+      <span class="badge badge-{{ 'active' if sim.status == 'success' else 'saturation' }}">
+        {{ 'Simulation complete' if sim.status == 'success' else 'Simulation error' }}
+      </span>
+      <span class="analysis-name">{{ analysis_labels[analysis] }}</span>
+    </p>
+
+    {% if sim.status == 'error' %}
+    <p class="sim-error">{{ sim.message }}</p>
+    {% if sim.detail %}<pre class="engine-detail">{{ sim.detail }}</pre>{% endif %}
+    {% else %}
+    <p class="note">
+      Engine <code>{{ sim.exe }}</code> &middot; exit code {{ sim.returncode }} &middot;
+      model <code>{{ sim.model }}</code>
+    </p>
+
+    <h3>SPICE output &mdash; ngspice, model CEQ</h3>
+    {% if analysis == 'dc' %}
+    <table>
+      <thead><tr><th>Quantity</th><th>Value</th><th>Unit</th></tr></thead>
+      <tbody>
+        <tr><td>VB</td><td>{{ "%.6f"|format(sim.data.vb_v) }}</td><td>V</td></tr>
+        <tr><td>VE</td><td>{{ "%.6f"|format(sim.data.ve_v) }}</td><td>V</td></tr>
+        <tr><td>VC</td><td>{{ "%.6f"|format(sim.data.vc_v) }}</td><td>V</td></tr>
+        <tr><td>VCE</td><td>{{ "%.6f"|format(sim.data.vce_v) }}</td><td>V</td></tr>
+        <tr><td>IC</td><td>{{ "%.6f"|format(sim.data.ic_ma) }}</td><td>mA</td></tr>
+      </tbody>
+    </table>
+    {% elif analysis == 'ac' %}
+    <table>
+      <thead><tr><th>Quantity</th><th>Value</th><th>Unit</th></tr></thead>
+      <tbody>
+        <tr><td>Midband gain</td><td>{{ "%.3f"|format(sim.data.midband_gain_db) }}</td><td>dB</td></tr>
+        <tr><td>Lower -3 dB</td><td>{{ sim.data.f_low_hz }}</td><td>Hz</td></tr>
+        <tr><td>Upper -3 dB</td><td>{{ sim.data.f_high_hz }}</td><td>Hz</td></tr>
+        <tr><td>Gain reference</td><td>V(output) / V(base)</td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+    {% else %}
+    <table>
+      <thead><tr><th>Quantity</th><th>Value</th><th>Unit</th></tr></thead>
+      <tbody>
+        <tr><td>Transient samples</td><td>{{ sim.data.time_s|length }}</td><td>points</td></tr>
+        <tr><td>Time span</td><td>{{ "%.3f"|format((sim.data.time_s|last) * 1000) }}</td><td>ms</td></tr>
+        <tr><td>Input node</td><td>V(input) before Cin</td><td>&mdash;</td></tr>
+        <tr><td>Output node</td><td>V(output) across RL</td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+    {% endif %}
+
+    {% if analysis == 'ac' %}
+      {% if plot_ac %}
+    <figure class="plot">
+      <img src="{{ plot_ac }}" alt="ngspice AC gain and phase versus frequency">
+      <figcaption>Gain and phase from the real ngspice AC sweep. Frequency (Hz) is a log axis; dashed lines mark -3 dB crossings when the sweep reaches them.</figcaption>
+    </figure>
+      {% else %}
+    <p class="plot-unavailable">AC plot unavailable; the parsed values above are unchanged.</p>
+      {% endif %}
+    {% elif analysis == 'tran' %}
+      {% if plot_tran %}
+    <figure class="plot">
+      <img src="{{ plot_tran }}" alt="ngspice input and output waveforms versus time">
+      <figcaption>V(input) and V(output) from the real ngspice transient samples. Time is in ms; voltage in V.</figcaption>
+    </figure>
+      {% else %}
+    <p class="plot-unavailable">Transient plot unavailable; the parsed values above are unchanged.</p>
+      {% endif %}
+    {% endif %}
+    {% endif %}
+
+    <details>
+      <summary>Netlist used</summary>
+      <pre>{{ sim.netlist }}</pre>
+    </details>
+    {% if sim.log %}
+    <details>
+      <summary>ngspice log (last 1500 characters)</summary>
+      <pre>{{ sim.log_excerpt }}</pre>
+    </details>
+    {% endif %}
+    <p class="note">
+      SPICE values above are produced by ngspice from the netlist shown. The
+      analytical reference uses a fixed VBE and constant beta, while SPICE
+      derives VBE from IS/BF/VAF; the two are not expected to match exactly.
     </p>
   </section>
   {% endif %}

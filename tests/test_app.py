@@ -141,5 +141,42 @@ class TestApp(unittest.TestCase):
         self.assertIn("1000000 V", body)
 
 
+DIVIDER = {**DEFAULTS, "r1": "100000", "r2": "22000", "rc": "2200",
+           "amplitude_mv": "10", "frequency_hz": "1000"}
+FIXED = {**DEFAULTS, "mode": "fixed"}
+
+
+class TestSimulation(unittest.TestCase):
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_simulate_dc_shows_spice_and_analytical_labels(self):
+        r = self.client.post("/", data={**DIVIDER, "action": "simulate", "analysis": "dc"})
+        body = r.get_data(as_text=True)
+        self.assertIn("SPICE", body)
+        self.assertIn("ngspice", body)
+        self.assertIn("Analytical reference", body)
+        self.assertIn(".model CEQ NPN", body)
+
+    def test_simulate_rejects_zero_amplitude(self):
+        r = self.client.post("/", data={**DIVIDER, "action": "simulate",
+                                        "analysis": "tran", "amplitude_mv": "0"})
+        body = r.get_data(as_text=True)
+        self.assertIn("Amplitude", body)
+        self.assertNotIn("Simulation complete", body)
+
+    def test_simulate_ac_renders_real_plot_data_uri(self):
+        r = self.client.post("/", data={**DIVIDER, "action": "simulate", "analysis": "ac"})
+        body = r.get_data(as_text=True)
+        self.assertIn("data:image/png;base64,", body)
+        self.assertIn("Frequency (Hz)", body)
+
+    def test_fixed_mode_ignores_simulate_action(self):
+        r = self.client.post("/", data={**FIXED, "action": "simulate", "analysis": "ac"})
+        body = r.get_data(as_text=True)
+        self.assertIn("Fixed bias", body)
+        self.assertNotIn("SPICE output", body)
+
+
 if __name__ == "__main__":
     unittest.main()

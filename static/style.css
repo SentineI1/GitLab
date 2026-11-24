@@ -125,3 +125,62 @@ td:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
 .crosscheck { color: var(--muted); }
 .crosscheck table { color: var(--ink); }
 .match { font-weight: 600; }
+
+/* Lab 4 SPICE simulation panel */
+.button-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.button-row button { grid-column: auto; }
+
+button.secondary {
+  background: #eaeef2;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.analysis-name { margin-left: .5rem; font-size: .85rem; color: var(--muted); }
+
+.simulation {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.simulation h3 { margin-top: 1.5rem; font-size: 1rem; }
+.simulation .note { font-size: .85rem; }
+.sim-error { color: var(--error); font-weight: 600; }
+
+.simulation pre,
+pre.engine-detail {
+  max-height: 20rem;
+  padding: .75rem;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: .78rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.simulation details { margin-top: 1rem; }
+.simulation summary { cursor: pointer; font-weight: 600; }
+
+.plot { margin: 1.5rem 0 0; }
+.plot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.plot figcaption { margin-top: .5rem; font-size: .8rem; color: var(--muted); }
+.plot-unavailable { color: var(--error); font-size: .85rem; }
