@@ -141,17 +141,24 @@ Choose **Voltage-divider bias**, select an analysis, then press **Run
 Simulation**. The original **Calculate** button keeps the Lab 3 behaviour, and
 fixed/emitter bias ignore the SPICE controls.
 
-The reference circuit is fixed in `spice_engine.py`; only the source amplitude
-and frequency fields are editable.
+The topology is fixed, but `VCC`, `R1`, `R2`, `RC`, `RE`, `beta`, source
+amplitude and frequency are all read from the form by `build_netlist()`.
+`RL = 10 kΩ` and `Cin = Cout = 10 µF` are fixed netlist constants. The table
+below is the Lab 4 handout fixture used for [`docs/validation.md`](docs/validation.md);
+it is **not** the page's initial default (the initial divider example uses
+47 kΩ / 10 kΩ / 4.7 kΩ / 1 kΩ). Enter these values to reproduce the recorded
+B2–B7 results.
 
-| Part | Value |
-| ---- | ----- |
-| VCC | 12 V |
-| R1 / R2 | 100 kΩ / 22 kΩ |
-| RC / RE | 2.2 kΩ / 1 kΩ |
-| RL | 10 kΩ |
-| Cin / Cout | 10 µF / 10 µF |
-| Source | 10 mV peak, 1 kHz by default |
+| Part | Value | Source |
+| ---- | ----- | ------ |
+| VCC | 12 V | form |
+| R1 / R2 | 100 kΩ / 22 kΩ | form |
+| RC / RE | 2.2 kΩ / 1 kΩ | form |
+| beta | 150 | form (SPICE `BF`) |
+| VBE | 0.7 V | analytical only |
+| RL | 10 kΩ | fixed in netlist |
+| Cin / Cout | 10 µF / 10 µF | fixed in netlist |
+| Source | 10 mV peak, 1 kHz | form |
 
 No instructor-verified starter files were present, so the netlist states its
 own reproducible model:
@@ -215,8 +222,12 @@ calculations, tool names, and browser evidence are recorded in
 [`docs/evidence/A5-fixed-rb0.png`](docs/evidence/A5-fixed-rb0.png).
 
 Repository: <https://github.com/SentineI1/GitLab>. The Lab 3 feature commits
-are `ac59a8b`, `cebf0e1`, and `9ca9343`; the submission commit is reported by
-`git log -1` after push.
+are `ac59a8b`, `cebf0e1`, and `9ca9343`. Lab 4 implementation commits are
+`402217e` (ngspice adapter), `8b63078` (web SPICE runs and plots) and
+`51b14b1` (UI polish). Browser acceptance B1–B8, checklist mapping and short
+answers are in [`docs/submission.md`](docs/submission.md); measurements and
+evidence are in [`docs/validation.md`](docs/validation.md). The final
+submission commit is reported by `git log -1` after push.
 
 ## Test
 
@@ -277,8 +288,9 @@ tests/test_spice_engine.py netlist, parsers, error gates, real ngspice smoke
 tests/test_plots.py        transient window and PNG data URIs
 requirements.txt          Flask 3.x and matplotlib 3.8+
 AGENTS.md                 rules for AI contributors
-docs/validation.md        Lab 3 A1–A5 browser results and Lab 4 ngspice evidence
-docs/evidence/            screenshot from the Lab 3 browser check
+docs/validation.md        Lab 3 A1–A5, Lab 4 ngspice and browser B1–B8 evidence
+docs/submission.md        checklist mapping, short answers, AI/student record
+docs/evidence/            selected browser screenshots and raw B1–B8 report
 ```
 
 ## Design notes
