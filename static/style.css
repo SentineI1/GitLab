@@ -4,6 +4,7 @@
   --line: #d7dde3;
   --bg: #f6f8fa;
   --accent: #1f6feb;
+  --accent-strong: #1558c0;
   --error: #b42318;
 }
 
@@ -19,6 +20,7 @@ body {
 
 .container {
   max-width: 880px;
+  min-width: 0;
   margin: 0 auto;
   padding: 1.5rem 2rem 2rem;
   background: #fff;
@@ -35,6 +37,7 @@ h2 { margin-top: 2rem; font-size: 1.15rem; }
   gap: 1.5rem;
   margin: 1.5rem 0;
   align-items: start;
+  min-width: 0;
 }
 
 @media (min-width: 760px) {
@@ -42,6 +45,7 @@ h2 { margin-top: 2rem; font-size: 1.15rem; }
 }
 
 .circuit-panel {
+  min-width: 0;
   margin: 0;
   padding: .75rem .75rem .5rem;
   background: var(--bg);
@@ -72,13 +76,40 @@ h2 { margin-top: 2rem; font-size: 1.15rem; }
 
 form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .75rem 1rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
   margin: 1.5rem 0;
+  min-width: 0;
 }
 
-.field { display: flex; flex-direction: column; gap: .25rem; }
+.field-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem 1rem;
+  min-width: 0;
+  margin: 0;
+  padding: .75rem 1rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.field-group legend {
+  padding: 0 .35rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.field { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
 .field-wide { grid-column: 1 / -1; }
+.field-note {
+  grid-column: 1 / -1;
+  margin: -.15rem 0 0;
+  font-size: .8rem;
+  color: var(--muted);
+}
 label { font-size: .85rem; color: var(--muted); }
 
 input,
@@ -95,13 +126,25 @@ button {
   padding: .6rem 1rem;
   border: 0;
   border-radius: 6px;
-  background: var(--accent);
+  background: var(--accent-strong);
   color: #fff;
   font: inherit;
   cursor: pointer;
 }
 
-.field-error { margin: 0; color: var(--error); font-size: .8rem; }
+button:hover { background: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+
+.field-error {
+  margin: .15rem 0 0;
+  padding: .3rem .5rem;
+  border-left: 3px solid var(--error);
+  border-radius: 4px;
+  background: #fff5f5;
+  color: var(--error);
+  font-size: .8rem;
+  font-weight: 600;
+}
 
 .badge {
   display: inline-block;
@@ -145,6 +188,28 @@ button.secondary {
 
 .analysis-name { margin-left: .5rem; font-size: .85rem; color: var(--muted); }
 
+.source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: .35rem 0 .75rem;
+}
+
+.source-chip,
+.engine-chip {
+  display: inline-block;
+  padding: .2rem .55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: .78rem;
+  color: var(--muted);
+}
+
+.source-spice { border-color: #b6d4fa; background: #f0f6ff; color: #1558c0; }
+.engine-chip { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+.engine-chip code { font: inherit; }
+
 .simulation {
   margin-top: 2rem;
   padding: 1rem 1.25rem;
@@ -155,7 +220,15 @@ button.secondary {
 
 .simulation h3 { margin-top: 1.5rem; font-size: 1rem; }
 .simulation .note { font-size: .85rem; }
-.sim-error { color: var(--error); font-weight: 600; }
+.sim-error {
+  margin: .5rem 0;
+  padding: .7rem .9rem;
+  border-left: 4px solid var(--error);
+  border-radius: 6px;
+  background: #fff5f5;
+  color: var(--error);
+  font-weight: 600;
+}
 
 .simulation pre,
 pre.engine-detail {
@@ -173,7 +246,12 @@ pre.engine-detail {
 .simulation details { margin-top: 1rem; }
 .simulation summary { cursor: pointer; font-weight: 600; }
 
-.plot { margin: 1.5rem 0 0; }
+.plot { margin: 1.5rem 0 0; min-width: 0; }
+.plot-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 6px;
+}
 .plot img {
   display: block;
   width: 100%;
@@ -184,4 +262,32 @@ pre.engine-detail {
 }
 
 .plot figcaption { margin-top: .5rem; font-size: .8rem; color: var(--muted); }
+.plot-hint { display: none; }
 .plot-unavailable { color: var(--error); font-size: .85rem; }
+
+@media (max-width: 599px) {
+  body { padding: .75rem .5rem; }
+  .container { padding: 1rem .75rem 1.25rem; border-radius: 8px; }
+  h1 { font-size: 1.3rem; }
+  h2 { font-size: 1.08rem; }
+  .workspace { grid-template-columns: minmax(0, 1fr); gap: 1rem; margin: 1rem 0; }
+  .field-group { grid-template-columns: 1fr; padding: .6rem .75rem .85rem; }
+  .button-row { grid-template-columns: 1fr; gap: .6rem; }
+  .circuit-caption { flex-wrap: wrap; }
+  .circuit .ref { font-size: 14px; }
+  .circuit .val { font-size: 13px; }
+  main section { min-width: 0; }
+  .simulation { padding: .75rem .9rem; }
+  .simulation .note { overflow-wrap: anywhere; }
+  .simulation .note code { overflow-wrap: anywhere; word-break: break-all; }
+  table { font-size: .85rem; table-layout: fixed; }
+  th, td { padding: .3rem .35rem; overflow-wrap: anywhere; }
+  .engine-chip { max-width: 100%; overflow-wrap: anywhere; }
+  .plot-scroll {
+    margin-inline: -.9rem;
+    padding-inline: .9rem;
+    scrollbar-width: thin;
+  }
+  .plot img { width: 600px; min-width: 600px; max-width: none; }
+  .plot-hint { display: inline; font-style: italic; }
+}
