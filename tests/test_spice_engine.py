@@ -10,6 +10,7 @@ from spice_engine import (
     cutoff_frequencies,
     parse_ac,
     parse_op,
+    parse_table,
     parse_tran,
     resolve_ngspice,
     simulate,
@@ -71,6 +72,26 @@ class TestEngineErrors(unittest.TestCase):
 
 
 class TestParsers(unittest.TestCase):
+    def test_parse_table_joins_paginated_headers(self):
+        text = (
+            "Index   frequency       vdb(output)\n"
+            "--------------------------------------------------------------------------------\n"
+            "0\t1.000000e+00\t-4.23572e+01\t\n"
+            "1\t1.122018e+00\t-4.12918e+01\t\n"
+            "\n"
+            "\n"
+            "Index   frequency       vdb(output)\n"
+            "--------------------------------------------------------------------------------\n"
+            "2\t1.258925e+00\t-4.03390e+01\t\n"
+            "               * ce voltage-divider amplifier\n"
+            "               AC Analysis  Tue Nov 24 15:37:49  2026\n"
+            "Index   frequency       vp(output)\n"
+            "--------------------------------------------------------------------------------\n"
+            "0\t1.000000e+00\t-1.44786e+00\t\n"
+        )
+        rows = parse_table(text, "vdb(output)")
+        self.assertEqual([row[0] for row in rows], [0.0, 1.0, 2.0])
+
     def test_parse_op_reads_ngspice_table(self):
         data = parse_op(OP_TEXT)
         self.assertAlmostEqual(data["vb_v"], 2.013016, places=6)

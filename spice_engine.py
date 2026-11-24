@@ -192,24 +192,33 @@ def _excerpt(text: str) -> str:
 
 
 def parse_table(text: str, marker: str) -> list[list[float]]:
-    """Read one numeric ``Index ...`` table identified by its header marker."""
-    lines = text.splitlines()
-    for index, line in enumerate(lines):
-        if not line.lstrip().startswith("Index") or marker not in line:
-            continue
-        rows: list[list[float]] = []
-        for raw in lines[index + 1 :]:
-            stripped = raw.strip()
-            if not stripped or stripped.startswith("---"):
-                continue
-            try:
-                rows.append([float(part) for part in stripped.split()])
-            except ValueError:
+    """Read one numeric table identified by its header marker.
+
+    ngspice paginates long ``.print`` output by repeating the ``Index`` header
+    every ~55 rows. All pages of the requested table are joined; a header for
+    a *different* table ends the collection, so no unrelated numbers leak in.
+    """
+    rows: list[list[float]] = []
+    collecting = False
+    for raw in text.splitlines():
+        stripped = raw.strip()
+        if stripped.startswith("Index"):
+            if marker in stripped:
+                collecting = True
+            elif collecting:
                 break
-        if not rows:
-            raise SimulationError(f"ngspice table {marker!r} is empty", _excerpt(text))
-        return rows
-    raise SimulationError(f"ngspice table {marker!r} is missing", _excerpt(text))
+            continue
+        if not collecting:
+            continue
+        if not stripped or stripped.startswith(("---", "*")):
+            continue
+        try:
+            rows.append([float(part) for part in stripped.split()])
+        except ValueError:
+            break
+    if not rows:
+        raise SimulationError(f"ngspice table {marker!r} is empty", _excerpt(text))
+    return rows
 
 
 def _column(rows: list[list[float]], column: int, marker: str) -> list[float]:
