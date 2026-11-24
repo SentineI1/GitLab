@@ -40,6 +40,15 @@ CIN = "10u"
 COUT = "10u"
 RL = "10k"
 CUTOFF_TEXT = "not determined in sweep range"
+
+# Informational lines ngspice emits between paginated `.print` tables. They are
+# not data, but they may appear before another page of the same table.
+_TABLE_BANNERS = (
+    "ac analysis",
+    "dc operating point",
+    "operating point",
+    "transient analysis",
+)
 MODEL = ".model CEQ NPN(IS=1E-14 BF={beta:g} VAF=100)"
 
 _REPO_BINARY = (
@@ -200,16 +209,43 @@ def _excerpt(text: str) -> str:
     return text[-1500:]
 
 
+def _is_table_banner(line: str) -> bool:
+    lowered = line.lower()
+    return any(lowered.startswith(prefix) for prefix in _TABLE_BANNERS)
+
+
+def _table_continues(lines: list[str], start: int, marker: str, expected: float) -> bool:
+    """True when a later row of this same table still has the expected index."""
+    for raw in lines[start:]:
+        text = raw.strip()
+        if text.startswith("Index"):
+            if marker not in text:
+                return False
+            continue
+        if not text or text.startswith(("---", "*")):
+            continue
+        try:
+            parts = text.split()
+            if len(parts) > 1 and float(parts[0]) == expected:
+                return True
+        except ValueError:
+            continue
+    return False
+
+
 def parse_table(text: str, marker: str) -> list[list[float]]:
     """Read one numeric table identified by its header marker.
 
     ngspice paginates long ``.print`` output by repeating the ``Index`` header
     every ~55 rows. All pages of the requested table are joined; a header for
-    a *different* table ends the collection, so no unrelated numbers leak in.
+    a *different* table ends the collection. Known informational banners are
+    skipped, but unexpected text that interrupts the table is an error: a
+    short read must never be presented as a complete table.
     """
+    lines = text.splitlines()
     rows: list[list[float]] = []
     collecting = False
-    for raw in text.splitlines():
+    for position, raw in enumerate(lines):
         stripped = raw.strip()
         if stripped.startswith("Index"):
             if marker in stripped:
@@ -221,14 +257,19 @@ def parse_table(text: str, marker: str) -> list[list[float]]:
             continue
         if not stripped or stripped.startswith(("---", "*")):
             continue
+        if _is_table_banner(stripped):
+            continue
         try:
             rows.append([float(part) for part in stripped.split()])
         except ValueError:
+            if _table_continues(lines, position + 1, marker, float(len(rows))):
+                raise SimulationError(
+                    f"ngspice table {marker!r} has unexpected text", _excerpt(text)
+                ) from None
+            # Ordinary end-of-run chatter after the final page is not tabular.
             break
     if not rows:
         raise SimulationError(f"ngspice table {marker!r} is empty", _excerpt(text))
-    # An unexpected banner could make the loop break early. Never present a
-    # short read as a complete table.
     if any(index != float(i) for i, index in enumerate(row[0] for row in rows)):
         raise SimulationError(f"ngspice table {marker!r} has missing rows", _excerpt(text))
     return rows

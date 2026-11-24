@@ -52,6 +52,17 @@ ANALYSIS_LABELS = {
 app = Flask(__name__)
 
 
+@app.template_filter("time_span")
+def _time_span(seconds):
+    """Format a measured time span with the largest unit that keeps it visible."""
+    value = float(seconds)
+    for unit, factor in (("s", 1.0), ("ms", 1e3), ("µs", 1e6), ("ns", 1e9)):
+        scaled = value * factor
+        if scaled >= 1.0 or unit == "ns":
+            return f"{scaled:.3f}", unit
+    return f"{value:.3f}", "s"
+
+
 def _render(values, errors, result=None, independent=None, comparison=None,
             sim=None, analysis=None, plot_ac=None, plot_tran=None):
     """Render the page with the given context."""

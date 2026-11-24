@@ -123,6 +123,21 @@ class TestParsers(unittest.TestCase):
         rows = parse_table(text, "vdb(output)")
         self.assertEqual([row[0] for row in rows], [0.0, 1.0, 2.0])
 
+    def test_parse_table_skips_banners_but_rejects_unexpected_text(self):
+        base = "Index   frequency       vdb(output)\n" + "-" * 80 + "\n"
+        text = (
+            base + "0\t1.0\t-40.0\t\n1\t2.0\t-35.0\t\n"
+            "               AC Analysis  Tue Nov 24 15:37:49  2026\n"
+            "2\t3.0\t-36.0\t\n"
+        )
+        self.assertEqual([row[0] for row in parse_table(text, "vdb(output)")],
+                         [0.0, 1.0, 2.0])
+        with self.assertRaises(SimulationError):
+            parse_table(
+                base + "0\t1.0\t-40.0\t\nunexpected banner\n1\t2.0\t-35.0\t\n",
+                "vdb(output)",
+            )
+
     def test_parse_table_rejects_missing_rows(self):
         text = (
             "Index   frequency       vdb(output)\n"

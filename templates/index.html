@@ -325,7 +325,8 @@
       <thead><tr><th>Quantity</th><th>Value</th><th>Unit</th></tr></thead>
       <tbody>
         <tr><td>Transient samples</td><td>{{ sim.data.time_s|length }}</td><td>points</td></tr>
-        <tr><td>Time span</td><td>{{ "%.3f"|format((sim.data.time_s|last) * 1000) }}</td><td>ms</td></tr>
+        {% set span = sim.data.time_s|last|time_span %}
+        <tr><td>Time span</td><td>{{ span[0] }}</td><td>{{ span[1] }}</td></tr>
         <tr><td>Input node</td><td>V(input) before Cin</td><td>&mdash;</td></tr>
         <tr><td>Output node</td><td>V(output) across RL</td><td>&mdash;</td></tr>
       </tbody>

@@ -211,7 +211,7 @@ example below, so the first page load is already demonstrable.
 .\.venv\Scripts\python.exe -m unittest discover -s tests -t . -v
 ```
 
-68 tests: the original Lab 3 model/region/cross-check/web cases, the ngspice
+70 tests: the original Lab 3 model/region/cross-check/web cases, the ngspice
 netlist/parser/error-gate cases (including three real engine runs), the plot
 window/PNG cases, and the SPICE web cases. The engine-dependent tests skip
 themselves if no ngspice binary is available; the other SPICE form/error tests

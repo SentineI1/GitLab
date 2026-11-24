@@ -95,7 +95,10 @@ period) and the plot shows only that five-period window of real samples.
 A post-review responsiveness check ran the transient analysis at higher
 frequencies: 10 kHz (`.tran 5e-06 0.0005 0 5e-06`), 1 MHz
 (`.tran 5e-08 5e-06 0 5e-08`) and 1 GHz (`.tran 5e-11 5e-09 0 5e-11`) each
-produced 108 real samples and a PNG in roughly 0.1 s.
+produced 108 real samples and a PNG in roughly 0.1 s. The page's Time span row
+is formatted from the parsed final sample: the same real runs render `5.000 ms`
+at 1 kHz, `5.000 µs` at 1 MHz and `5.000 ns` at 1 GHz, rather than a rounded
+`0.000 ms`.
 
 ### Paginated-table regression
 
@@ -106,6 +109,10 @@ page. A regression test was written and observed RED before the fix; after
 joining all pages of the same table, the reruns above produced 141 AC points
 and 508 transient samples. The test is
 `tests.test_spice_engine.TestParsers.test_parse_table_joins_paginated_headers`.
+A follow-up check hardens the parser: known ngspice banners between pages are
+skipped, but unexpected text that interrupts a table raises a `SimulationError`
+instead of silently dropping the remaining rows. That test is
+`tests.test_spice_engine.TestParsers.test_parse_table_skips_banners_but_rejects_unexpected_text`.
 
 ## Live server verification
 
@@ -128,6 +135,7 @@ PASS dc: Simulation complete, SPICE table, netlist + log details, no plot
 PASS ac: Simulation complete, SPICE table, netlist + log details, PNG plot
 PASS ac: "Frequency (Hz)" label and literal cutoff text present
 PASS tran: Simulation complete, SPICE table, netlist + log details, PNG plot
+PASS 1 GHz: time span rendered from real samples as 5.000 ns
 PASS amplitude 0: "Amplitude must be greater than 0.", no banner, no plot
 ```
 
@@ -150,7 +158,8 @@ The suite also pins the engine gates called out in review: nonzero exit codes,
 `Error:`/`Fatal error:`/`aborted` text, timeouts, missing table rows, an
 unexpected `analysis` value, zero/non-numeric frequency, the visible engine
 error detail with a broken `NGSPICE_PATH`, the literal cutoff text in rendered
-HTML, and emitter mode ignoring `simulate`.
+HTML, adaptive transient time-span units from parsed samples, banner handling
+in table parsing, and emitter mode ignoring `simulate`.
 
 Final command and result:
 
@@ -159,6 +168,6 @@ Final command and result:
 ```
 
 ```
-Ran 68 tests in 0.948s
+Ran 70 tests in 1.304s
 OK
 ```

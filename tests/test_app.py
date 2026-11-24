@@ -1,4 +1,5 @@
 import os
+import re
 import unittest
 from unittest.mock import patch
 
@@ -214,6 +215,27 @@ class TestSimulation(unittest.TestCase):
         self.assertIn("data:image/png;base64,", body)
         self.assertIn("Frequency (Hz)", body)
         self.assertIn("not determined in sweep range", body)
+
+    def test_transient_time_span_uses_adaptive_units(self):
+        self.require_ngspice()
+        cases = (
+            ("1000", "5.000", "ms"),
+            ("1000000", "5.000", "µs"),
+            ("1000000000", "5.000", "ns"),
+        )
+        for frequency, value, unit in cases:
+            with self.subTest(frequency=frequency):
+                r = self.client.post("/", data={**DIVIDER, "action": "simulate",
+                                                "analysis": "tran",
+                                                "frequency_hz": frequency})
+                body = r.get_data(as_text=True)
+                self.assertIn("Simulation complete", body)
+                match = re.search(
+                    r"<tr><td>Time span</td><td>([^<]+)</td><td>([^<]+)</td></tr>",
+                    body,
+                )
+                self.assertIsNotNone(match)
+                self.assertEqual((match.group(1), match.group(2)), (value, unit))
 
     def test_fixed_mode_ignores_simulate_action(self):
         r = self.client.post("/", data={**FIXED, "action": "simulate", "analysis": "ac"})
