@@ -1,14 +1,18 @@
-# BJT Common-Emitter DC Bias Calculator
+# BJT Common-Emitter Bias Calculator + SPICE Lab
 
-Flask web app for the ENG29 2121 Lab 2 deliverable: enter the seven bias
-values of an NPN common-emitter stage and get back the DC operating point —
-with units, input validation, a region warning when the transistor is not in
-the active region, and a second, independently coded calculation that is
-compared against the first.
+Flask web app for ENG29 2121. The original Lab 3 DC bias calculator is unchanged:
+enter the seven bias values of an NPN common-emitter stage and get the operating
+point with units, input validation, a region warning, and an independent
+cross-check.
 
-It is a bias calculator, not a circuit simulator. No AC, small-signal,
-transient, or frequency analysis; no schematic editor or netlist; no FET or
-MOSFET support; no database, login, or history.
+Lab 4 v1 adds **real** ngspice analysis for one reference voltage-divider
+amplifier: `.op`, `.ac` and `.tran` runs with data-driven plots, the netlist and
+the engine log, shown beside the analytical reference. No value in a SPICE
+table or plot is invented; engine failures are displayed, never hidden.
+
+Out of scope: emitter bypass variants, animated overlays, SPICE for the fixed
+and emitter bias modes, a schematic/netlist editor, FET/MOSFET support, and any
+database, login, or history.
 
 ## The circuit
 
@@ -131,6 +135,47 @@ paths share no algebra. The page shows both values for `IC` and `VCE`, the
 absolute and relative deltas, and a match indicator (relative difference
 `<= 1e-6`, with an absolute floor so exact zeros are not false mismatches).
 
+## SPICE simulation (Lab 4 v1)
+
+Choose **Voltage-divider bias**, select an analysis, then press **Run
+Simulation**. The original **Calculate** button keeps the Lab 3 behaviour, and
+fixed/emitter bias ignore the SPICE controls.
+
+The reference circuit is fixed in `spice_engine.py`; only the source amplitude
+and frequency fields are editable.
+
+| Part | Value |
+| ---- | ----- |
+| VCC | 12 V |
+| R1 / R2 | 100 kΩ / 22 kΩ |
+| RC / RE | 2.2 kΩ / 1 kΩ |
+| RL | 10 kΩ |
+| Cin / Cout | 10 µF / 10 µF |
+| Source | 10 mV peak, 1 kHz by default |
+
+No instructor-verified starter files were present, so the netlist states its
+own reproducible model:
+
+```
+.model CEQ NPN(IS=1E-14 BF=<beta from the form> VAF=100)
+```
+
+`BF` is the only link to the analytical beta field. `IS` and `VAF` are fixed,
+documented constants; the analytical **VBE** field is *not* a SPICE parameter
+(SPICE derives VBE from the model), which is why the two result blocks are not
+expected to match digit-for-digit.
+
+| Analysis | netlist command | Meaning |
+| -------- | --------------- | ------- |
+| DC | `.op` | VB, VE, VC, VCE and IC at the operating point |
+| AC | `.ac dec 20 1 10Meg` | 141-point log sweep; gain is `20 log10 |V(output)/V(base)|` (Vin measured at the base after Cin), phase is the difference in degrees |
+| Transient | `.tran 10u 5m 0 10u` | Vin at the source side of Cin and Vout across RL; step shortened at higher frequencies |
+
+A −3 dB cutoff is reported only when the real sweep crosses it; otherwise the
+page shows the literal text `not determined in sweep range`. Node names in the
+netlist are long (`base`, `collect`, `emit`, `output`) because single-letter
+node names produce spurious `.print` parse warnings in this ngspice build.
+
 ## Setup
 
 Python 3.12 is installed at
@@ -141,8 +186,15 @@ Python 3.12 is installed at
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-`requirements.txt` requires Flask 3.x (`Flask>=3.0,<4.0`); it is the only
-runtime dependency.
+`requirements.txt` requires Flask 3.x (`Flask>=3.0,<4.0`) and matplotlib
+(`>=3.8`), which renders the SPICE plots.
+
+SPICE needs the official ngspice-47 Windows 64-bit console binary. In this
+workspace it is extracted to
+`tools/ngspice/Spice64/bin/ngspice_con.exe` and gitignored; the binary is not
+committed. `ngspice.exe` is silent in this environment and is deliberately not
+used. To use another build, set `NGSPICE_PATH` to the executable — an invalid
+explicit path fails fast instead of falling back silently.
 
 ## Run
 
@@ -159,8 +211,10 @@ example below, so the first page load is already demonstrable.
 .\.venv\Scripts\python.exe -m unittest discover -s tests -t . -v
 ```
 
-34 tests: the model and region cases, the cross-check agreement cases, and the
-web layer.
+56 tests: the original Lab 3 model/region/cross-check/web cases, the ngspice
+netlist/parser/error-path cases (including three real engine runs), and the
+four SPICE web cases. The real-engine test skips itself if no ngspice binary is
+available.
 
 ## Worked example
 
@@ -198,15 +252,22 @@ app.py                    Flask app and routes only
 bias_modes.py             mode list, per-mode validation, three solvers
 bjt_bias.py               validation, Thevenin solve, region classification
 independent_check.py      base-node KCL solve, no shared algebra
-templates/index.html      circuit diagram, form, results, and cross-check
-static/style.css          layout and the region badge colours
+spice_engine.py           netlist, ngspice process, .print table parsing
+plots.py                  matplotlib PNG data URIs from parsed arrays
+templates/index.html      diagram, form, results, cross-check, SPICE panel
+static/style.css          layout, badges, SPICE panel and plots
 tests/test_bjt_bias.py    model, regions, validation
 tests/test_independent.py agreement across cases
-tests/test_app.py         GET, valid POST, invalid POST, styling
-requirements.txt          Flask 3.x
+tests/test_app.py         GET/POST, styling, SPICE web cases
+tests/test_spice_engine.py netlist, parsers, error gates, real ngspice smoke
+requirements.txt          Flask 3.x and matplotlib 3.8+
+AGENTS.md                 rules for AI contributors
+docs/validation.md        real ngspice numbers and browser/HTTP verification
 ```
 
 ## Design notes
 
 - `docs/superpowers/specs/2026-11-11-bjt-ce-bias-design.md`
 - `docs/superpowers/plans/2026-11-11-bjt-ce-bias.md`
+- `docs/superpowers/specs/2026-11-24-common-emitter-spice-v1-design.md`
+- `docs/superpowers/plans/2026-11-24-common-emitter-spice-v1.md`

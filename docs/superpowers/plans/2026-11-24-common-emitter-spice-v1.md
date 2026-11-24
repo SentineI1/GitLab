@@ -50,7 +50,7 @@
   - `cutoff_frequencies(frequencies: Sequence[float], gain_db: Sequence[float]) -> tuple[float | None, float | None]`
   - `simulate(analysis: str, values: Mapping[str, float], exe: str | None = None, timeout: int = 20) -> dict`
 
-- [ ] **Step 1: Write failing tests for netlist, error gates, parsers and a real run**
+- [x] **Step 1: Write failing tests for netlist, error gates, parsers and a real run**
 
 Create `tests/test_spice_engine.py` with:
 
@@ -119,12 +119,12 @@ def test_real_ngspice_smoke():
 Use `unittest` (`patch.dict(os.environ, ...)`, `@unittest.skipUnless`) to match
 the existing test suite; `assertRaises` is `self.assertRaises`.
 
-- [ ] **Step 2: Run the new tests to confirm they fail**
+- [x] **Step 2: Run the new tests to confirm they fail**
 
 Run: `.\.venv\Scripts\python.exe -m unittest tests.test_spice_engine -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'spice_engine'`.
 
-- [ ] **Step 3: Implement `spice_engine.py`**
+- [x] **Step 3: Implement `spice_engine.py`**
 
 - `FIXTURE` constants: `CIN="10u"`, `COUT="10u"`, `RL="10k"`, model string;
   `_num()` formats floats with `:g`.
@@ -157,12 +157,12 @@ Expected: FAIL — `ModuleNotFoundError: No module named 'spice_engine'`.
   fallback). Otherwise try the repo binary, then PATH candidates; raise with
   all attempted paths when none is executable.
 
-- [ ] **Step 4: Run the tests until green**
+- [x] **Step 4: Run the tests until green**
 
 Run: `.\.venv\Scripts\python.exe -m unittest tests.test_spice_engine -v`
 Expected: all new tests PASS, including three real ngspice runs.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add spice_engine.py tests/test_spice_engine.py
@@ -189,7 +189,7 @@ git commit -m "feat: add ngspice netlist, run and parse adapter"
     `data:image/png;base64,...` strings.
   - Other POSTs keep the exact Lab 3 context and output.
 
-- [ ] **Step 1: Write failing Flask tests**
+- [x] **Step 1: Write failing Flask tests**
 
 Add to `tests/test_app.py` (keep all existing tests untouched):
 
@@ -223,12 +223,12 @@ def test_fixed_mode_ignores_simulate_action():
     self.assertNotIn(b"SPICE output", r.data)
 ```
 
-- [ ] **Step 2: Run the new tests to confirm they fail**
+- [x] **Step 2: Run the new tests to confirm they fail**
 
 Run: `.\.venv\Scripts\python.exe -m unittest tests.test_app -v`
 Expected: the four new tests FAIL (no `sim` context / no labels).
 
-- [ ] **Step 3: Extend `app.py`**
+- [x] **Step 3: Extend `app.py`**
 
 Add `amplitude_mv: "10"`, `frequency_hz: "1"` to `DEFAULTS`; extend
 `ALL_FIELDS`; add `SIM_ANALYSES = ("dc", "ac", "tran")`. In `index()`, when
@@ -240,7 +240,7 @@ catch `SimulationError` into `{"status":"error", ...}`; compute the same
 analytical `result`/`independent`/`comparison` as today and render all of it
 with `sim`, `analysis`, and plots. Other paths return exactly today's context.
 
-- [ ] **Step 4: Add `plots.py` and install matplotlib**
+- [x] **Step 4: Add `plots.py` and install matplotlib**
 
 Run `.\.venv\Scripts\python.exe -m pip install matplotlib`, add
 `matplotlib>=3.8` to `requirements.txt`. In `plots.py` set Agg before pyplot
@@ -252,7 +252,7 @@ import, close every figure, and render:
 Return base64 data URI; on exception return `None` (the SPICE table still
 shows, with an explicit "plot unavailable" note in the template).
 
-- [ ] **Step 5: Extend `templates/index.html` and `static/style.css`**
+- [x] **Step 5: Extend `templates/index.html` and `static/style.css`**
 
 In the form: analysis `<select name="analysis">` (DC / AC / Transient),
 `amplitude_mv` (mV peak) and `frequency_hz` (Hz) inputs, and a second submit
@@ -266,12 +266,12 @@ beta/VBE`), cutoff text (`sim.data.f_low_hz`, `f_high_hz`), and
 heading only when `sim` is set so the two are never mistaken for one dataset.
 Add modest CSS for the simulation panel and plot sizing; no JS needed.
 
-- [ ] **Step 6: Run all tests**
+- [x] **Step 6: Run all tests**
 
 Run: `.\.venv\Scripts\python.exe -m unittest discover -s tests -t .`
 Expected: 43 existing + new engine/app tests all PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```powershell
 git add app.py plots.py templates/index.html static/style.css requirements.txt tests/test_app.py
@@ -291,7 +291,7 @@ git commit -m "feat: run and plot CE SPICE analyses in the web app"
 - Produces: reproducible setup instructions, provenance rules, validation table
   with **actual** ngspice numbers and browser log.
 
-- [ ] **Step 1: Capture real engine evidence**
+- [x] **Step 1: Capture real engine evidence**
 
 Run each analysis through the Flask test client (or live app) with the baseline
 fixture and record in `docs/validation.md`: model line, sweep/stop commands,
@@ -300,7 +300,7 @@ location. Copy the analytical divider numbers from the existing path beside
 them with the assumption note from the spec. No number may be written before
 the run has produced it.
 
-- [ ] **Step 2: Browser verification**
+- [x] **Step 2: Browser verification**
 
 Start `.\.venv\Scripts\python.exe -m flask --app app run --port 5000`, open
 `http://127.0.0.1:5000/` in the in-app Browser, and check: three bias modes
@@ -310,7 +310,7 @@ plot; a broken `NGSPICE_PATH` shows an error banner when restarted with that
 env var. Save a screenshot to `docs/captures/` if available and add its path
 to the validation log.
 
-- [ ] **Step 3: Write docs**
+- [x] **Step 3: Write docs**
 
 `README.md`: setup (venv, pip install -r requirements.txt, ngspice-47 location,
 `NGSPICE_PATH`, `ngspice.exe` caveat), run command, baseline fixture, model
@@ -318,7 +318,7 @@ parameters, analysis reference definitions, out-of-scope list.
 `AGENTS.md`: rules for AI contributors — preserve Lab 3, no fabricated data,
 always show engine errors, update `docs/validation.md` when results change.
 
-- [ ] **Step 4: Final verification and commit**
+- [x] **Step 4: Final verification and commit**
 
 Run the full suite again and `git status`; commit docs. Then use the
 finishing-a-development-branch workflow to ask about pushing.
