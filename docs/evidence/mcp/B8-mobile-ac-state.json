@@ -1,0 +1,137 @@
+{
+  "url": "http://127.0.0.1:5000/",
+  "title": "BJT Common-Emitter Bias Calculator",
+  "readyState": "complete",
+  "headings": [
+    "Analytical reference · DC Operating Point · Voltage-divider bias",
+    "Analytical reference · Cross-check",
+    "SPICE simulation · ngspice",
+    "SPICE output — ngspice, model CEQ"
+  ],
+  "badge": "Simulation complete",
+  "analysisName": "AC frequency response",
+  "engineNote": "Engine C:\\Users\\B6830021\\Desktop\\GitLab\\tools\\ngspice\\Spice64\\bin\\ngspice_con.exe · exit code 0 · model .model CEQ NPN(IS=1E-14 BF=150 VAF=100)",
+  "simError": "",
+  "engineDetail": "",
+  "fieldErrors": [],
+  "analyticalRows": [
+    [
+      "VBB",
+      "2.164",
+      "V"
+    ],
+    [
+      "RB",
+      "18032.787",
+      "ohm"
+    ],
+    [
+      "IB",
+      "0.0087",
+      "mA"
+    ],
+    [
+      "IC",
+      "1.2991",
+      "mA"
+    ],
+    [
+      "IE",
+      "1.3078",
+      "mA"
+    ],
+    [
+      "VB",
+      "2.008",
+      "V"
+    ],
+    [
+      "VC",
+      "9.142",
+      "V"
+    ],
+    [
+      "VE",
+      "1.308",
+      "V"
+    ],
+    [
+      "VCE",
+      "7.834",
+      "V"
+    ]
+  ],
+  "crosscheckRows": [
+    [
+      "IC (mA)",
+      "1.2991",
+      "1.2991",
+      "2.220e-16",
+      "1.709e-16"
+    ],
+    [
+      "VCE (V)",
+      "7.834",
+      "7.834",
+      "0.000e+00",
+      "0.000e+00"
+    ]
+  ],
+  "spiceRows": [
+    [
+      "Midband gain",
+      "4.895",
+      "dB"
+    ],
+    [
+      "Lower -3 dB",
+      "1.3097692877710334",
+      "Hz"
+    ],
+    [
+      "Upper -3 dB",
+      "not determined in sweep range",
+      "Hz"
+    ],
+    [
+      "Gain reference",
+      "V(output) / V(base)",
+      "—"
+    ]
+  ],
+  "details": [
+    {
+      "summary": "Netlist used",
+      "text": "* CE voltage-divider amplifier, reference circuit\nVCC vcc 0 DC 12\nR1 vcc base 100000\nR2 base 0 22000\nRC vcc collect 2200\nRE emit 0 1000\nQ1 collect base emit CEQ\n.model CEQ NPN(IS=1E-14 BF=150 VAF=100)\nCin input base 10u\nCout collect output 10u\nRL output 0 10k\nVs input 0 DC 0 AC 0.01 SIN(0 0.01 1000)\n.ac dec 20 1 10Meg\n.print ac vdb(output)\n.print ac vp(output)\n.print ac vdb(base)\n.print ac vp(base)\n.end"
+    },
+    {
+      "summary": "ngspice log (last 1500 characters)",
+      "text": "815e-06\t\n105\t1.778279e+05\t5.525591e-06\t\n106\t1.995262e+05\t4.924688e-06\t\n107\t2.238721e+05\t4.389133e-06\t\n108\t2.511886e+05\t3.911819e-06\t\n109\t2.818383e+05\t3.486412e-06\t\n110\t3.162278e+05\t3.107268e-06\t\n111\t3.548134e+05\t2.769355e-06\t\n112\t3.981072e+05\t2.468191e-06\t\n\f\nIndex   frequency       vp(base)        \n--------------------------------------------------------------------------------\n113\t4.466836e+05\t2.199777e-06\t\n114\t5.011872e+05\t1.960554e-06\t\n115\t5.623413e+05\t1.747345e-06\t\n116\t6.309573e+05\t1.557323e-06\t\n117\t7.079458e+05\t1.387966e-06\t\n118\t7.943282e+05\t1.237026e-06\t\n119\t8.912509e+05\t1.102500e-06\t\n120\t1.000000e+06\t9.826044e-07\t\n121\t1.122018e+06\t8.757471e-07\t\n122\t1.258925e+06\t7.805104e-07\t\n123\t1.412538e+06\t6.956307e-07\t\n124\t1.584893e+06\t6.199815e-07\t\n125\t1.778279e+06\t5.525591e-07\t\n126\t1.995262e+06\t4.924688e-07\t\n127\t2.238721e+06\t4.389133e-07\t\n128\t2.511886e+06\t3.911819e-07\t\n129\t2.818383e+06\t3.486412e-07\t\n130\t3.162278e+06\t3.107268e-07\t\n131\t3.548134e+06\t2.769355e-07\t\n132\t3.981072e+06\t2.468191e-07\t\n133\t4.466836e+06\t2.199777e-07\t\n134\t5.011872e+06\t1.960554e-07\t\n135\t5.623413e+06\t1.747345e-07\t\n136\t6.309573e+06\t1.557323e-07\t\n137\t7.079458e+06\t1.387966e-07\t\n138\t7.943282e+06\t1.237026e-07\t\n139\t8.912509e+06\t1.102500e-07\t\n140\t1.000000e+07\t9.826044e-08\t\n\n\nTotal analysis time (seconds) = 0.0003901\n\nTotal elapsed time (seconds) = 0.004 \n\nTotal DRAM available = 16123.121 MB.\nDRAM currently available = 7803.984 MB.\nMaximum ngspice program size =   10.449 MB.\nCurrent ngspice program size =   10.449 MB."
+    }
+  ],
+  "plot": {
+    "sha256": "9a21d8dfc2209bf0c3fc5f61bf2b9920403dcdd587752935edc40cd826eddf18",
+    "bytes": 49106,
+    "naturalWidth": 868,
+    "naturalHeight": 648,
+    "alt": "ngspice AC gain and phase versus frequency"
+  },
+  "plotScroll": {
+    "clientWidth": 331,
+    "scrollWidth": 629
+  },
+  "sourceChips": [
+    "Source: analytical model · fixed VBE, constant beta",
+    "Source: real ngspice .print tables",
+    "Engine: C:\\Users\\B6830021\\Desktop\\GitLab\\tools\\ngspice\\Spice64\\bin\\ngspice_con.exe"
+  ],
+  "layout": {
+    "viewport": 375,
+    "scrollWidth": 375,
+    "workspaceColumns": "333px",
+    "buttons": [
+      333,
+      333
+    ]
+  }
+}

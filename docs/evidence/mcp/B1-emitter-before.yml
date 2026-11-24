@@ -1,0 +1,112 @@
+- main [ref=f13e2]:
+  - heading "BJT Common-Emitter Bias Calculator" [level=1] [ref=f13e3]
+  - paragraph [ref=f13e4]: Enter the DC bias values of an NPN common-emitter stage and pick the bias network. The calculator reports the operating point, warns when the transistor is not in the active region, and (for the divider) checks the result with a second method.
+  - generic [ref=f13e5]:
+    - figure "beta = 100 · VBE = 0.7 V Active" [ref=f13e6]:
+      - 'img "NPN common-emitter fixed-bias circuit: VCC feeds RB to the base and RC to the collector; the emitter is grounded." [ref=f13e7]':
+        - generic [ref=f13e15]: VCC
+        - generic [ref=f13e16]: 12 V
+        - generic [ref=f13e17]: RB
+        - generic [ref=f13e18]: 1000000 ohm
+        - generic [ref=f13e19]: RC
+        - generic [ref=f13e20]: 2200 ohm
+        - generic [ref=f13e21]: Q1
+      - generic [ref=f13e22]:
+        - generic [ref=f13e23]: beta = 100 · VBE = 0.7 V
+        - generic [ref=f13e24]: Active
+    - generic [ref=f13e25]:
+      - group "Bias network" [ref=f13e26]:
+        - generic [ref=f13e28]:
+          - generic [ref=f13e29]: Bias mode
+          - combobox "Bias mode" [ref=f13e30]:
+            - option "Voltage-divider bias"
+            - option "Fixed bias"
+            - option "Emitter bias" [selected]
+        - generic [ref=f13e31]:
+          - generic [ref=f13e32]: VCC (V)
+          - spinbutton "VCC (V)" [ref=f13e33]: "12"
+        - generic [ref=f13e34]:
+          - generic [ref=f13e35]: R1 (ohm) · divider
+          - spinbutton "R1 (ohm) · divider" [ref=f13e36]: "100000"
+        - generic [ref=f13e37]:
+          - generic [ref=f13e38]: R2 (ohm) · divider
+          - spinbutton "R2 (ohm) · divider" [ref=f13e39]: "22000"
+        - generic [ref=f13e40]:
+          - generic [ref=f13e41]: RB (ohm) · fixed / emitter
+          - spinbutton "RB (ohm) · fixed / emitter" [ref=f13e42]: "1000000"
+        - generic [ref=f13e43]:
+          - generic [ref=f13e44]: RC (ohm)
+          - spinbutton "RC (ohm)" [ref=f13e45]: "2200"
+        - generic [ref=f13e46]:
+          - generic [ref=f13e47]: RE (ohm) · divider / emitter
+          - spinbutton "RE (ohm) · divider / emitter" [ref=f13e48]: "1000"
+      - group "Device parameters" [ref=f13e49]:
+        - generic [ref=f13e51]:
+          - generic [ref=f13e52]: beta
+          - spinbutton "beta" [ref=f13e53]: "100"
+        - generic [ref=f13e54]:
+          - generic [ref=f13e55]: VBE (V)
+          - spinbutton "VBE (V)" [ref=f13e56]: "0.7"
+      - group "SPICE source" [ref=f13e57]:
+        - generic [ref=f13e59]:
+          - generic [ref=f13e60]: SPICE analysis · divider mode only
+          - combobox "SPICE analysis · divider mode only" [ref=f13e61]:
+            - option "DC operating point" [selected]
+            - option "AC frequency response"
+            - option "Transient waveform"
+        - paragraph [ref=f13e62]:
+          - text: Runs local
+          - code [ref=f13e63]: ngspice_con.exe
+          - text: ; the netlist and engine log are shown after each run.
+        - generic [ref=f13e64]:
+          - generic [ref=f13e65]: Source amplitude (mV peak)
+          - spinbutton "Source amplitude (mV peak)" [ref=f13e66]: "10"
+        - generic [ref=f13e67]:
+          - generic [ref=f13e68]: Source frequency (Hz)
+          - spinbutton "Source frequency (Hz)" [ref=f13e69]: "1000"
+      - generic [ref=f13e70]:
+        - button "Calculate" [ref=f13e71] [cursor=pointer]
+        - button "Run Simulation" [ref=f13e72] [cursor=pointer]
+  - generic [ref=f13e73]:
+    - heading "DC Operating Point · Fixed bias" [level=2] [ref=f13e74]
+    - paragraph [ref=f13e75]:
+      - generic [ref=f13e76]: "Source: analytical model · fixed VBE, constant beta"
+    - paragraph [ref=f13e77]:
+      - generic [ref=f13e78]: Active
+    - paragraph [ref=f13e79]: "Active: the transistor is in the active region."
+    - table [ref=f13e80]:
+      - rowgroup [ref=f13e81]:
+        - row [ref=f13e82]:
+          - columnheader "Quantity" [ref=f13e83]
+          - columnheader "Value" [ref=f13e84]
+          - columnheader "Unit" [ref=f13e85]
+      - rowgroup [ref=f13e86]:
+        - row [ref=f13e87]:
+          - cell "IB" [ref=f13e88]
+          - cell "0.0113" [ref=f13e89]
+          - cell "mA" [ref=f13e90]
+        - row [ref=f13e91]:
+          - cell "IC" [ref=f13e92]
+          - cell "1.1300" [ref=f13e93]
+          - cell "mA" [ref=f13e94]
+        - row [ref=f13e95]:
+          - cell "IE" [ref=f13e96]
+          - cell "1.1413" [ref=f13e97]
+          - cell "mA" [ref=f13e98]
+        - row [ref=f13e99]:
+          - cell "VB" [ref=f13e100]
+          - cell "0.700" [ref=f13e101]
+          - cell "V" [ref=f13e102]
+        - row [ref=f13e103]:
+          - cell "VC" [ref=f13e104]
+          - cell "9.514" [ref=f13e105]
+          - cell "V" [ref=f13e106]
+        - row [ref=f13e107]:
+          - cell "VE" [ref=f13e108]
+          - cell "0.000" [ref=f13e109]
+          - cell "V" [ref=f13e110]
+        - row [ref=f13e111]:
+          - cell "VCE" [ref=f13e112]
+          - cell "9.514" [ref=f13e113]
+          - cell "V" [ref=f13e114]
+    - paragraph [ref=f13e115]: Values are the raw solution of the model equations; nothing is clamped.

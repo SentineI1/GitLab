@@ -1,0 +1,137 @@
+{
+  "url": "http://127.0.0.1:5000/",
+  "title": "BJT Common-Emitter Bias Calculator",
+  "readyState": "complete",
+  "headings": [
+    "Analytical reference · DC Operating Point · Voltage-divider bias",
+    "Analytical reference · Cross-check",
+    "SPICE simulation · ngspice",
+    "SPICE output — ngspice, model CEQ"
+  ],
+  "badge": "Simulation complete",
+  "analysisName": "Transient waveform",
+  "engineNote": "Engine C:\\Users\\B6830021\\Desktop\\GitLab\\tools\\ngspice\\Spice64\\bin\\ngspice_con.exe · exit code 0 · model .model CEQ NPN(IS=1E-14 BF=150 VAF=100)",
+  "simError": "",
+  "engineDetail": "",
+  "fieldErrors": [],
+  "analyticalRows": [
+    [
+      "VBB",
+      "2.164",
+      "V"
+    ],
+    [
+      "RB",
+      "18032.787",
+      "ohm"
+    ],
+    [
+      "IB",
+      "0.0087",
+      "mA"
+    ],
+    [
+      "IC",
+      "1.2991",
+      "mA"
+    ],
+    [
+      "IE",
+      "1.3078",
+      "mA"
+    ],
+    [
+      "VB",
+      "2.008",
+      "V"
+    ],
+    [
+      "VC",
+      "9.142",
+      "V"
+    ],
+    [
+      "VE",
+      "1.308",
+      "V"
+    ],
+    [
+      "VCE",
+      "7.834",
+      "V"
+    ]
+  ],
+  "crosscheckRows": [
+    [
+      "IC (mA)",
+      "1.2991",
+      "1.2991",
+      "2.220e-16",
+      "1.709e-16"
+    ],
+    [
+      "VCE (V)",
+      "7.834",
+      "7.834",
+      "0.000e+00",
+      "0.000e+00"
+    ]
+  ],
+  "spiceRows": [
+    [
+      "Transient samples",
+      "508",
+      "points"
+    ],
+    [
+      "Time span",
+      "5.000",
+      "ms"
+    ],
+    [
+      "Input node",
+      "V(input) before Cin",
+      "—"
+    ],
+    [
+      "Output node",
+      "V(output) across RL",
+      "—"
+    ]
+  ],
+  "details": [
+    {
+      "summary": "Netlist used",
+      "text": "* CE voltage-divider amplifier, reference circuit\nVCC vcc 0 DC 12\nR1 vcc base 100000\nR2 base 0 22000\nRC vcc collect 2200\nRE emit 0 1000\nQ1 collect base emit CEQ\n.model CEQ NPN(IS=1E-14 BF=150 VAF=100)\nCin input base 10u\nCout collect output 10u\nRL output 0 10k\nVs input 0 DC 0 AC 0.01 SIN(0 0.01 1000)\n.tran 10u 5m 0 10u\n.print tran v(input) v(output)\n.end"
+    },
+    {
+      "summary": "ngspice log (last 1500 characters)",
+      "text": "03\t1.734121e-02\t\n480\t4.732800e-03\t-9.94166e-03\t1.749215e-02\t\n481\t4.742800e-03\t-9.98977e-03\t1.757414e-02\t\n482\t4.752800e-03\t-9.99845e-03\t1.758687e-02\t\n483\t4.762800e-03\t-9.96768e-03\t1.753028e-02\t\n484\t4.772800e-03\t-9.89756e-03\t1.740461e-02\t\n485\t4.782800e-03\t-9.78839e-03\t1.721033e-02\t\n486\t4.792800e-03\t-9.64058e-03\t1.694823e-02\t\n487\t4.802800e-03\t-9.45473e-03\t1.661933e-02\t\n488\t4.812800e-03\t-9.23157e-03\t1.622493e-02\t\n489\t4.822800e-03\t-8.97197e-03\t1.576660e-02\t\n490\t4.832800e-03\t-8.67696e-03\t1.524612e-02\t\n491\t4.842800e-03\t-8.34771e-03\t1.466557e-02\t\n492\t4.852800e-03\t-7.98551e-03\t1.402723e-02\t\n493\t4.862800e-03\t-7.59180e-03\t1.333362e-02\t\n494\t4.872800e-03\t-7.16813e-03\t1.258747e-02\t\n495\t4.882800e-03\t-6.71617e-03\t1.179173e-02\t\n496\t4.892800e-03\t-6.23770e-03\t1.094954e-02\t\n497\t4.902800e-03\t-5.73462e-03\t1.006421e-02\t\n498\t4.912800e-03\t-5.20890e-03\t9.139258e-03\t\n499\t4.922800e-03\t-4.66263e-03\t8.178315e-03\t\n500\t4.932800e-03\t-4.09796e-03\t7.185178e-03\t\n501\t4.942800e-03\t-3.51711e-03\t6.163765e-03\t\n502\t4.952800e-03\t-2.92238e-03\t5.118106e-03\t\n503\t4.962800e-03\t-2.31612e-03\t4.052329e-03\t\n504\t4.972800e-03\t-1.70072e-03\t2.970638e-03\t\n505\t4.982800e-03\t-1.07861e-03\t1.877302e-03\t\n506\t4.991400e-03\t-5.40091e-04\t9.310070e-04\t\n507\t5.000000e-03\t-1.22465e-17\t-1.79461e-05\t\n\n\nTotal analysis time (seconds) = 0.0011346\n\nTotal elapsed time (seconds) = 0.005 \n\nTotal DRAM available = 16123.121 MB.\nDRAM currently available = 7883.039 MB.\nMaximum ngspice program size =   10.434 MB.\nCurrent ngspice program size =   10.434 MB."
+    }
+  ],
+  "plot": {
+    "sha256": "316ac0fffa1b1ef3f97daaa2667b2068a32827d7923e51a05b8623bbc1ef2bef",
+    "bytes": 68852,
+    "naturalWidth": 869,
+    "naturalHeight": 428,
+    "alt": "ngspice input and output waveforms versus time"
+  },
+  "plotScroll": {
+    "clientWidth": 772,
+    "scrollWidth": 772
+  },
+  "sourceChips": [
+    "Source: analytical model · fixed VBE, constant beta",
+    "Source: real ngspice .print tables",
+    "Engine: C:\\Users\\B6830021\\Desktop\\GitLab\\tools\\ngspice\\Spice64\\bin\\ngspice_con.exe"
+  ],
+  "layout": {
+    "viewport": 1265,
+    "scrollWidth": 1265,
+    "workspaceColumns": "395px 395px",
+    "buttons": [
+      190,
+      190
+    ]
+  }
+}

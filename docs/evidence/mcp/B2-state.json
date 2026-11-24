@@ -1,0 +1,133 @@
+{
+  "url": "http://127.0.0.1:5000/",
+  "title": "BJT Common-Emitter Bias Calculator",
+  "readyState": "complete",
+  "headings": [
+    "Analytical reference · DC Operating Point · Voltage-divider bias",
+    "Analytical reference · Cross-check",
+    "SPICE simulation · ngspice",
+    "SPICE output — ngspice, model CEQ"
+  ],
+  "badge": "Simulation complete",
+  "analysisName": "DC operating point",
+  "engineNote": "Engine C:\\Users\\B6830021\\Desktop\\GitLab\\tools\\ngspice\\Spice64\\bin\\ngspice_con.exe · exit code 0 · model .model CEQ NPN(IS=1E-14 BF=150 VAF=100)",
+  "simError": "",
+  "engineDetail": "",
+  "fieldErrors": [],
+  "analyticalRows": [
+    [
+      "VBB",
+      "2.164",
+      "V"
+    ],
+    [
+      "RB",
+      "18032.787",
+      "ohm"
+    ],
+    [
+      "IB",
+      "0.0087",
+      "mA"
+    ],
+    [
+      "IC",
+      "1.2991",
+      "mA"
+    ],
+    [
+      "IE",
+      "1.3078",
+      "mA"
+    ],
+    [
+      "VB",
+      "2.008",
+      "V"
+    ],
+    [
+      "VC",
+      "9.142",
+      "V"
+    ],
+    [
+      "VE",
+      "1.308",
+      "V"
+    ],
+    [
+      "VCE",
+      "7.834",
+      "V"
+    ]
+  ],
+  "crosscheckRows": [
+    [
+      "IC (mA)",
+      "1.2991",
+      "1.2991",
+      "2.220e-16",
+      "1.709e-16"
+    ],
+    [
+      "VCE (V)",
+      "7.834",
+      "7.834",
+      "0.000e+00",
+      "0.000e+00"
+    ]
+  ],
+  "spiceRows": [
+    [
+      "VB",
+      "2.013016",
+      "V"
+    ],
+    [
+      "VE",
+      "1.352006",
+      "V"
+    ],
+    [
+      "VC",
+      "9.044000",
+      "V"
+    ],
+    [
+      "VCE",
+      "7.691994",
+      "V"
+    ],
+    [
+      "IC",
+      "1.344126",
+      "mA"
+    ]
+  ],
+  "details": [
+    {
+      "summary": "Netlist used",
+      "text": "* CE voltage-divider amplifier, reference circuit\nVCC vcc 0 DC 12\nR1 vcc base 100000\nR2 base 0 22000\nRC vcc collect 2200\nRE emit 0 1000\nQ1 collect base emit CEQ\n.model CEQ NPN(IS=1E-14 BF=150 VAF=100)\nCin input base 10u\nCout collect output 10u\nRL output 0 10k\nVs input 0 DC 0 AC 0.01 SIN(0 0.01 1000)\n.op\n.print op v(base) v(emit) v(collect) @q1[ic]\n.end"
+    },
+    {
+      "summary": "ngspice log (last 1500 characters)",
+      "text": "exp                     -                     -\n        pwl                     -                     -\n       sffm                     -                     -\n         am                     -                     -\n    trnoise                     -                     -\n   trrandom                     -                     -\n    portnum                     0                     0\n         z0                     0                     0\n        pwr                     0                     0\n       freq                     0                     0\n      phase                     0                     0\n          i                     0           -0.00144351\n          p                     0            -0.0173221\n\n               * ce voltage-divider amplifier, reference circuit\n               Operating Point  Tue Nov 24 18:02:24  2026\n--------------------------------------------------------------------------------\nIndex   v(base)         v(emit)         v(collect)      @q1[ic]         \n--------------------------------------------------------------------------------\n0\t2.013016e+00\t1.352006e+00\t9.044000e+00\t1.344126e-03\t\n\n\nTotal analysis time (seconds) = 0.0003051\n\nTotal elapsed time (seconds) = 0.003 \n\nTotal DRAM available = 16123.121 MB.\nDRAM currently available = 8011.336 MB.\nMaximum ngspice program size =   10.410 MB.\nCurrent ngspice program size =   10.410 MB.\n\n\nWarning: can't parse 'base': ignored\nWarning: can't parse 'emit': ignored\nWarning: can't parse 'collect': ignored"
+    }
+  ],
+  "plot": null,
+  "plotScroll": null,
+  "sourceChips": [
+    "Source: analytical model · fixed VBE, constant beta",
+    "Source: real ngspice .print tables",
+    "Engine: C:\\Users\\B6830021\\Desktop\\GitLab\\tools\\ngspice\\Spice64\\bin\\ngspice_con.exe"
+  ],
+  "layout": {
+    "viewport": 1265,
+    "scrollWidth": 1265,
+    "workspaceColumns": "395px 395px",
+    "buttons": [
+      190,
+      190
+    ]
+  }
+}

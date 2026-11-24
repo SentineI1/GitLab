@@ -1,0 +1,68 @@
+{
+  "url": "http://127.0.0.1:5000/",
+  "title": "BJT Common-Emitter Bias Calculator",
+  "readyState": "complete",
+  "headings": [
+    "DC Operating Point · Fixed bias"
+  ],
+  "badge": "",
+  "analysisName": "",
+  "engineNote": "",
+  "simError": "",
+  "engineDetail": "",
+  "fieldErrors": [],
+  "analyticalRows": [
+    [
+      "IB",
+      "0.0113",
+      "mA"
+    ],
+    [
+      "IC",
+      "1.1300",
+      "mA"
+    ],
+    [
+      "IE",
+      "1.1413",
+      "mA"
+    ],
+    [
+      "VB",
+      "0.700",
+      "V"
+    ],
+    [
+      "VC",
+      "9.514",
+      "V"
+    ],
+    [
+      "VE",
+      "0.000",
+      "V"
+    ],
+    [
+      "VCE",
+      "9.514",
+      "V"
+    ]
+  ],
+  "crosscheckRows": [],
+  "spiceRows": [],
+  "details": [],
+  "plot": null,
+  "plotScroll": null,
+  "sourceChips": [
+    "Source: analytical model · fixed VBE, constant beta"
+  ],
+  "layout": {
+    "viewport": 1265,
+    "scrollWidth": 1265,
+    "workspaceColumns": "395px 395px",
+    "buttons": [
+      190,
+      190
+    ]
+  }
+}

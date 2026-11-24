@@ -1,0 +1,94 @@
+{
+  "url": "http://127.0.0.1:5000/",
+  "title": "BJT Common-Emitter Bias Calculator",
+  "readyState": "complete",
+  "headings": [
+    "DC Operating Point · Voltage-divider bias",
+    "Cross-check"
+  ],
+  "badge": "",
+  "analysisName": "",
+  "engineNote": "",
+  "simError": "",
+  "engineDetail": "",
+  "fieldErrors": [],
+  "analyticalRows": [
+    [
+      "VBB",
+      "2.164",
+      "V"
+    ],
+    [
+      "RB",
+      "18032.787",
+      "ohm"
+    ],
+    [
+      "IB",
+      "0.0123",
+      "mA"
+    ],
+    [
+      "IC",
+      "1.2299",
+      "mA"
+    ],
+    [
+      "IE",
+      "1.2422",
+      "mA"
+    ],
+    [
+      "VB",
+      "1.942",
+      "V"
+    ],
+    [
+      "VC",
+      "9.294",
+      "V"
+    ],
+    [
+      "VE",
+      "1.242",
+      "V"
+    ],
+    [
+      "VCE",
+      "8.052",
+      "V"
+    ]
+  ],
+  "crosscheckRows": [
+    [
+      "IC (mA)",
+      "1.2299",
+      "1.2299",
+      "2.220e-16",
+      "1.805e-16"
+    ],
+    [
+      "VCE (V)",
+      "8.052",
+      "8.052",
+      "0.000e+00",
+      "0.000e+00"
+    ]
+  ],
+  "spiceRows": [],
+  "details": [],
+  "plot": null,
+  "plotScroll": null,
+  "sourceChips": [
+    "Source: analytical model · fixed VBE, constant beta"
+  ],
+  "layout": {
+    "viewport": 1265,
+    "scrollWidth": 1265,
+    "workspaceColumns": "395px 395px",
+    "buttons": [
+      190,
+      190
+    ]
+  }
+}

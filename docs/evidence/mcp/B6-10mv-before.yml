@@ -1,0 +1,70 @@
+- main [ref=f24e2]:
+  - heading "BJT Common-Emitter Bias Calculator" [level=1] [ref=f24e3]
+  - paragraph [ref=f24e4]: Enter the DC bias values of an NPN common-emitter stage and pick the bias network. The calculator reports the operating point, warns when the transistor is not in the active region, and (for the divider) checks the result with a second method.
+  - generic [ref=f24e5]:
+    - figure "beta = 150 · VBE = 0.7 V" [ref=f24e6]:
+      - 'img "NPN common-emitter bias circuit: VCC feeds R1 and RC; R2 and RE return to ground." [ref=f24e7]':
+        - generic [ref=f24e17]: VCC
+        - generic [ref=f24e18]: 12 V
+        - generic [ref=f24e19]: R1
+        - generic [ref=f24e20]: 47000 ohm
+        - generic [ref=f24e21]: R2
+        - generic [ref=f24e22]: 10000 ohm
+        - generic [ref=f24e23]: RC
+        - generic [ref=f24e24]: 4700 ohm
+        - generic [ref=f24e25]: RE
+        - generic [ref=f24e26]: 1000 ohm
+        - generic [ref=f24e27]: Q1
+    - generic [ref=f24e30]:
+      - group "Bias network" [ref=f24e31]:
+        - generic [ref=f24e33]:
+          - generic [ref=f24e34]: Bias mode
+          - combobox "Bias mode" [ref=f24e35]:
+            - option "Voltage-divider bias" [selected]
+            - option "Fixed bias"
+            - option "Emitter bias"
+        - generic [ref=f24e36]:
+          - generic [ref=f24e37]: VCC (V)
+          - spinbutton "VCC (V)" [ref=f24e38]: "12"
+        - generic [ref=f24e39]:
+          - generic [ref=f24e40]: R1 (ohm) · divider
+          - spinbutton "R1 (ohm) · divider" [ref=f24e41]: "100000"
+        - generic [ref=f24e42]:
+          - generic [ref=f24e43]: R2 (ohm) · divider
+          - spinbutton "R2 (ohm) · divider" [ref=f24e44]: "22000"
+        - generic [ref=f24e45]:
+          - generic [ref=f24e46]: RB (ohm) · fixed / emitter
+          - spinbutton "RB (ohm) · fixed / emitter" [ref=f24e47]: "1200000"
+        - generic [ref=f24e48]:
+          - generic [ref=f24e49]: RC (ohm)
+          - spinbutton "RC (ohm)" [ref=f24e50]: "2200"
+        - generic [ref=f24e51]:
+          - generic [ref=f24e52]: RE (ohm) · divider / emitter
+          - spinbutton "RE (ohm) · divider / emitter" [ref=f24e53]: "1000"
+      - group "Device parameters" [ref=f24e54]:
+        - generic [ref=f24e56]:
+          - generic [ref=f24e57]: beta
+          - spinbutton "beta" [ref=f24e58]: "150"
+        - generic [ref=f24e59]:
+          - generic [ref=f24e60]: VBE (V)
+          - spinbutton "VBE (V)" [ref=f24e61]: "0.7"
+      - group "SPICE source" [ref=f24e62]:
+        - generic [ref=f24e64]:
+          - generic [ref=f24e65]: SPICE analysis · divider mode only
+          - combobox "SPICE analysis · divider mode only" [ref=f24e66]:
+            - option "DC operating point"
+            - option "AC frequency response"
+            - option "Transient waveform" [selected]
+        - paragraph [ref=f24e67]:
+          - text: Runs local
+          - code [ref=f24e68]: ngspice_con.exe
+          - text: ; the netlist and engine log are shown after each run.
+        - generic [ref=f24e69]:
+          - generic [ref=f24e70]: Source amplitude (mV peak)
+          - spinbutton "Source amplitude (mV peak)" [active] [ref=f24e71]: "10"
+        - generic [ref=f24e72]:
+          - generic [ref=f24e73]: Source frequency (Hz)
+          - spinbutton "Source frequency (Hz)" [ref=f24e74]: "1000"
+      - generic [ref=f24e75]:
+        - button "Calculate" [ref=f24e76] [cursor=pointer]
+        - button "Run Simulation" [ref=f24e77] [cursor=pointer]

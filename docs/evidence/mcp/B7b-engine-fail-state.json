@@ -1,0 +1,101 @@
+{
+  "url": "http://127.0.0.1:5001/",
+  "title": "BJT Common-Emitter Bias Calculator",
+  "readyState": "complete",
+  "headings": [
+    "Analytical reference · DC Operating Point · Voltage-divider bias",
+    "Analytical reference · Cross-check",
+    "SPICE simulation · ngspice"
+  ],
+  "badge": "Simulation error",
+  "analysisName": "DC operating point",
+  "engineNote": "SPICE values above are produced by ngspice from the netlist shown. The analytical reference uses a fixed VBE and constant beta, while SPICE derives VBE from IS/BF/VAF; the two are not expected to match exactly.",
+  "simError": "ngspice not found at NGSPICE_PATH: C:\\nope\\ngspice.exe",
+  "engineDetail": "Set NGSPICE_PATH to the ngspice_con.exe executable or leave it unset.",
+  "fieldErrors": [],
+  "analyticalRows": [
+    [
+      "VBB",
+      "2.164",
+      "V"
+    ],
+    [
+      "RB",
+      "18032.787",
+      "ohm"
+    ],
+    [
+      "IB",
+      "0.0087",
+      "mA"
+    ],
+    [
+      "IC",
+      "1.2991",
+      "mA"
+    ],
+    [
+      "IE",
+      "1.3078",
+      "mA"
+    ],
+    [
+      "VB",
+      "2.008",
+      "V"
+    ],
+    [
+      "VC",
+      "9.142",
+      "V"
+    ],
+    [
+      "VE",
+      "1.308",
+      "V"
+    ],
+    [
+      "VCE",
+      "7.834",
+      "V"
+    ]
+  ],
+  "crosscheckRows": [
+    [
+      "IC (mA)",
+      "1.2991",
+      "1.2991",
+      "2.220e-16",
+      "1.709e-16"
+    ],
+    [
+      "VCE (V)",
+      "7.834",
+      "7.834",
+      "0.000e+00",
+      "0.000e+00"
+    ]
+  ],
+  "spiceRows": [],
+  "details": [
+    {
+      "summary": "Netlist used",
+      "text": "* CE voltage-divider amplifier, reference circuit\nVCC vcc 0 DC 12\nR1 vcc base 100000\nR2 base 0 22000\nRC vcc collect 2200\nRE emit 0 1000\nQ1 collect base emit CEQ\n.model CEQ NPN(IS=1E-14 BF=150 VAF=100)\nCin input base 10u\nCout collect output 10u\nRL output 0 10k\nVs input 0 DC 0 AC 0.01 SIN(0 0.01 1000)\n.op\n.print op v(base) v(emit) v(collect) @q1[ic]\n.end"
+    }
+  ],
+  "plot": null,
+  "plotScroll": null,
+  "sourceChips": [
+    "Source: analytical model · fixed VBE, constant beta",
+    "Source: real ngspice .print tables"
+  ],
+  "layout": {
+    "viewport": 1265,
+    "scrollWidth": 1265,
+    "workspaceColumns": "395px 395px",
+    "buttons": [
+      190,
+      190
+    ]
+  }
+}

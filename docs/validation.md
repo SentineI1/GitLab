@@ -275,26 +275,37 @@ OK
 **Date:** 2026-11-24
 **App:** `http://127.0.0.1:5000/`, Flask started with
 `.\.venv\Scripts\python.exe -m flask --app app run --port 5000`
-**Tool:** local Playwright 1.65.1 + installed Google Chrome channel, not
-Playwright MCP (the MCP server was not connected in this harness). This was a
-real browser: real navigations, real form fills/selects, real button submits,
-aria snapshots, and screenshots. Screenshots were **not** used as the only
-engineering evidence; DOM values, netlists, ngspice log excerpts, and plot PNG
-hashes were also captured.
+**Tool for the final accepted run:** Playwright MCP via `tools.playwright.*`
+(`browser_navigate`, `browser_snapshot`, `browser_select_option`,
+`browser_fill_form`, `browser_click`, `browser_wait_for`, `browser_evaluate`,
+`browser_take_screenshot`, `browser_resize`) with installed Google Chrome. The
+MCP server was added as a global local server named `playwright` running
+`npx -y @playwright/mcp@latest --browser chrome --isolated`, and the OpenCode
+CLI reported `✓ playwright connected`.
 
-No application code was changed during this B1–B8 acceptance pass. The only
-changes after the pass are documentation and selected evidence files.
+An earlier local Playwright 1.65.1 + Chrome pass was recorded first because MCP
+was not connected at that time. Its evidence remains in
+[`evidence/B1-B8-report.json`](evidence/B1-B8-report.json) and the top-level
+`docs/evidence/*.png` files. The MCP rerun documented below is the accepted
+B1–B8 evidence and is stored in [`evidence/mcp/`](evidence/mcp/). Screenshots
+were **not** used as the only engineering evidence: DOM values, netlists,
+ngspice log excerpts and base64 PNG SHA256 hashes were captured too.
+
+No application code was changed in either acceptance pass; only documentation
+and selected evidence files changed afterwards.
 
 ## Method for every case
 
-`fresh navigation → body ariaSnapshot → select/fill exact values → real submit
-→ waitForLoadState('networkidle') → new ariaSnapshot → read DOM/netlist/log/plot
-→ compare with independent or recorded reference → screenshot`.
+`fresh navigation → browser_snapshot → browser_select_option /
+browser_fill_form → browser_click → browser_wait_for → browser_snapshot →
+browser_evaluate (DOM, netlist, log, base64 PNG hash) → compare with independent
+or recorded reference → browser_take_screenshot`.
 
-A new browser context was used for B1, B2, B3, B4, B5, B6, B7a, B7b, B8
-desktop and B8 mobile. B1 switched modes inside its one case and snapshotted
-after each Calculate submit. The raw machine-readable result is
-[`evidence/B1-B8-report.json`](evidence/B1-B8-report.json).
+There was a fresh navigation for B1, B2, B3, B4, B5, B6, B7a, B7b, B8 desktop
+and B8 mobile. B1 switched modes inside its one case and snapshotted after each
+Calculate submit. The raw MCP observations are in
+[`evidence/mcp/report.json`](evidence/mcp/report.json), with one
+`*-state.json`, snapshots and screenshot per submitted case.
 
 ## Pass criteria
 
@@ -322,39 +333,39 @@ initial defaults are different, so defaults were not relied on.
 
 ## Results
 
-| Case | Expected / reference | Observed in real browser (units) | Status | Evidence |
+| Case | Expected / reference | Observed via Playwright MCP (units) | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| **B1 Divider** | Lab 3 A1: IC 1.229858 mA, VCE 8.052155 V, heading `Voltage-divider bias` | IC **1.2299 mA**, VCE **8.052 V**; ΔIC +0.000042 mA, ΔVCE −0.000155 V; heading `DC Operating Point · Voltage-divider bias` | **PASS** | `B1-fresh.yml`, `B1-divider-before-calculate.yml`, `B1-divider-updated.yml`, [`B1-divider.png`](evidence/B1-divider.png) |
-| **B1 Fixed** | Lab 3 A2: IC 1.130000 mA, VCE 9.514000 V, fixed heading | IC **1.1300 mA**, VCE **9.514 V**, VE 0.000 V; Δ = 0; heading `DC Operating Point · Fixed bias` | **PASS** | `B1-fixed-before-calculate.yml`, `B1-fixed-updated.yml`, [`B1-fixed.png`](evidence/B1-fixed.png) |
-| **B1 Emitter** | Lab 3 A3: IC 1.026340 mA, VCE 8.705450 V, emitter heading | IC **1.0263 mA**, VCE **8.705 V**, VE 1.037 V; ΔIC −0.000040 mA, ΔVCE −0.000450 V; heading `DC Operating Point · Emitter bias` | **PASS** | `B1-emitter-before-calculate.yml`, `B1-emitter-updated.yml`, [`B1-emitter.png`](evidence/B1-emitter.png) |
-| **B2 DC SPICE** | Recorded ngspice run: VB 2.013016 V, VE 1.352006 V, VC 9.044000 V, VCE 7.691994 V, IC 1.344126 mA | Badge `Simulation complete`, `DC operating point`, exit code 0; VB **2.013016 V**, VE **1.352006 V**, VC **9.044000 V**, VCE **7.691994 V**, IC **1.344126 mA**; all deltas 0 | **PASS** | `B2-fresh.yml`, `B2-updated.yml`, [`B2-dc-spice.png`](evidence/B2-dc-spice.png), `B2-netlist.txt`, `B2-log.txt` in the raw report |
-| **B3 Change RE** | Only RE 1000 → 2000 Ω; independent analytical direction: IC 1.299098 → 0.686149 mA, VCE 7.834226 → 9.109026 V, gain decreases | DC: IC **1.344126 → 0.715678 mA**, VCE **7.691994 → 8.985421 V**. AC midband gain **4.895 → −1.112 dB**. Netlist `RE emit 0 1000` → `RE emit 0 2000`; AC PNG SHA256 `9a21d8…` → `2f18ae…` | **PASS** | [`B3-before_re1000_ac.png`](evidence/B3-before_re1000_ac.png), [`B3-after_re2000_ac.png`](evidence/B3-after_re2000_ac.png), snapshots/netlists/logs in raw report |
-| **B4 AC / Bode** | Real `.ac dec 20 1 10Meg`; midband 4.895 dB, lower −3 dB 1.3097692877710334 Hz, upper `not determined in sweep range`, gain ref `V(output) / V(base)`, phase from `vp()` in degrees | Same four displayed rows with correct units (`dB`, `Hz`, `—`). Netlist contains `.print ac vdb(output)`, `vp(output)`, `vdb(base)`, `vp(base)`. Browser log excerpt parsed 36 numeric rows; full-run phase at midband −179.735° is recorded in the AC section above. Plot PNG 868×648, SHA256 `9a21d8df…` | **PASS** | `B4-updated.yml`, [`B4-ac-bode.png`](evidence/B4-ac-bode.png), `B4-netlist.txt`, `B4-log.txt` in the raw report |
-| **B5 Transient** | Real `.tran 10u 5m 0 10u`; 508 samples, 5.000 ms, 10 mV peak at 1 kHz, inversion | `Transient samples` **508 points**, `Time span` **5.000 ms**, input `V(input) before Cin`, output `V(output) across RL`. Excerpt peaks |Vin| **0.00999845 V**, |Vout| **0.01758687 V**; Vin/Vout correlation **−0.999999** (180° inversion). Plot SHA256 `316ac0ff…` | **PASS** | `B5-updated.yml`, [`B5-tran-waveform.png`](evidence/B5-tran-waveform.png), `B5-netlist.txt`, `B5-log.txt` in the raw report |
-| **B6 Change source** | Amplitude 10 → 20 mV peak at 1 kHz; waveform peaks roughly double and plot bytes change | Netlist `SIN(0 0.01 1000)` → `SIN(0 0.02 1000)`; peak Vin **0.00999845 → 0.01999690 V**, peak Vout **0.01758687 → 0.03518732 V**; both 508 points / 5.000 ms; correlation −0.999999 both runs; PNG SHA256 `316ac0ff…` → `75256a27…` | **PASS** | [`B6-source-10mv.png`](evidence/B6-source-10mv.png), [`B6-source-20mv.png`](evidence/B6-source-20mv.png), netlists/logs in raw report |
-| **B7a Invalid RE** | RE = 0 Ω → visible field error, no hang, no fake success/plot | Field error **"RE must be greater than 0."**, no `Simulation complete` badge, plot absent | **PASS** | `B7a-updated.yml`, [`B7-invalid-re.png`](evidence/B7-invalid-re.png) |
-| **B7b Engine fail** | Explicit invalid `NGSPICE_PATH` → visible error with path, no plot | Badge `Simulation error`; message `ngspice not found at NGSPICE_PATH: C:\nope\ngspice.exe`; detail `Set NGSPICE_PATH to the ngspice_con.exe executable or leave it unset.`; plot absent | **PASS** | `B7b-updated.yml`, [`B7-engine-fail.png`](evidence/B7-engine-fail.png). Separate Flask on port 5001, stopped after the run |
-| **B8 Desktop 1280×800** | No critical clipping, graph/units/buttons readable, mode switch works | viewport/scrollWidth **1280/1280**; AC plot 868×648 in a 772 px container (no scroll needed); switch to Emitter → `DC Operating Point · Emitter bias`, no field errors | **PASS** | `B8-desktop-ac-updated.yml`, [`B8-desktop-ac.png`](evidence/B8-desktop-ac.png) |
-| **B8 Mobile 390×844** | Same content at phone width; graph may use its intended scroll container | viewport/scrollWidth **390/390**; buttons full-width 348 px; plot container client 346 px / scroll 629 px (intentional horizontal plot scroll); switch to Fixed → `DC Operating Point · Fixed bias`, no field errors | **PASS** | `B8-mobile-ac-updated.yml`, [`B8-mobile-ac.png`](evidence/B8-mobile-ac.png) |
+| **B1 Divider** | Lab 3 A1: IC 1.229858 mA, VCE 8.052155 V, heading `Voltage-divider bias` | IC **1.2299 mA**, VCE **8.052 V**; ΔIC +0.000042 mA, ΔVCE −0.000155 V; heading `DC Operating Point · Voltage-divider bias` | **PASS** | [`B1-divider-state.json`](evidence/mcp/B1-divider-state.json), [`B1-divider.png`](evidence/mcp/B1-divider.png), before snapshot `B1-divider-before.yml` |
+| **B1 Fixed** | Lab 3 A2: IC 1.130000 mA, VCE 9.514000 V, fixed heading | IC **1.1300 mA**, VCE **9.514 V**, VE 0.000 V; Δ = 0; heading `DC Operating Point · Fixed bias` | **PASS** | [`B1-fixed-state.json`](evidence/mcp/B1-fixed-state.json), [`B1-fixed.png`](evidence/mcp/B1-fixed.png), before snapshot `B1-fixed-before.yml` |
+| **B1 Emitter** | Lab 3 A3: IC 1.026340 mA, VCE 8.705450 V, emitter heading | IC **1.0263 mA**, VCE **8.705 V**, VE 1.037 V; ΔIC −0.000040 mA, ΔVCE −0.000450 V; heading `DC Operating Point · Emitter bias` | **PASS** | [`B1-emitter-state.json`](evidence/mcp/B1-emitter-state.json), [`B1-emitter.png`](evidence/mcp/B1-emitter.png), before snapshot `B1-emitter-before.yml` |
+| **B2 DC SPICE** | Recorded ngspice run: VB 2.013016 V, VE 1.352006 V, VC 9.044000 V, VCE 7.691994 V, IC 1.344126 mA | Badge `Simulation complete`, `DC operating point`, exit code 0; VB **2.013016 V**, VE **1.352006 V**, VC **9.044000 V**, VCE **7.691994 V**, IC **1.344126 mA**; all deltas 0 | **PASS** | [`B2-state.json`](evidence/mcp/B2-state.json) contains netlist + log; [`B2.png`](evidence/mcp/B2.png); snapshots `B2-before.yml`, `B2-after.yml` |
+| **B3 Change RE** | Only RE 1000 → 2000 Ω; independent analytical direction: IC 1.299098 → 0.686149 mA, VCE 7.834226 → 9.109026 V, gain decreases | DC: IC **1.344126 → 0.715678 mA**, VCE **7.691994 → 8.985421 V**. AC midband gain **4.895 → −1.112 dB**. Netlist `RE emit 0 1000` → `RE emit 0 2000`; AC PNG SHA256 `9a21d8…` → `2f18ae…` | **PASS** | [`B3-re1000-ac.png`](evidence/mcp/B3-re1000-ac.png), [`B3-re2000-ac.png`](evidence/mcp/B3-re2000-ac.png), four `B3-*-state.json` files |
+| **B4 AC / Bode** | Real `.ac dec 20 1 10Meg`; midband 4.895 dB, lower −3 dB 1.3097692877710334 Hz, upper `not determined in sweep range`, gain ref `V(output) / V(base)`, phase from `vp()` in degrees | Same four displayed rows with correct units (`dB`, `Hz`, `—`). Netlist contains `.print ac vdb(output)`, `vp(output)`, `vdb(base)`, `vp(base)`. Browser log excerpt parsed 36 numeric rows; full-run phase at midband −179.735° is recorded in the AC section above. Plot PNG 868×648, SHA256 `9a21d8df…` | **PASS** | [`B4-ac-state.json`](evidence/mcp/B4-ac-state.json) contains netlist + log; [`B4-ac.png`](evidence/mcp/B4-ac.png); snapshot `B4-ac.yml` |
+| **B5 Transient** | Real `.tran 10u 5m 0 10u`; 508 samples, 5.000 ms, 10 mV peak at 1 kHz, inversion | `Transient samples` **508 points**, `Time span` **5.000 ms**, input `V(input) before Cin`, output `V(output) across RL`. Excerpt peaks |Vin| **0.00999845 V**, |Vout| **0.01758687 V**; Vin/Vout correlation **−0.999999** (180° inversion). Plot SHA256 `316ac0ff…` | **PASS** | [`B5-tran-state.json`](evidence/mcp/B5-tran-state.json) contains netlist + log; [`B5-tran.png`](evidence/mcp/B5-tran.png); snapshot `B5-tran.yml` |
+| **B6 Change source** | Amplitude 10 → 20 mV peak at 1 kHz; waveform peaks roughly double and plot bytes change | Netlist `SIN(0 0.01 1000)` → `SIN(0 0.02 1000)`; peak Vin **0.00999845 → 0.01999690 V**, peak Vout **0.01758687 → 0.03518732 V**; both 508 points / 5.000 ms; correlation −0.999999 both runs; PNG SHA256 `316ac0ff…` → `75256a27…` | **PASS** | [`B6-10mv.png`](evidence/mcp/B6-10mv.png), [`B6-20mv.png`](evidence/mcp/B6-20mv.png), [`report.json`](evidence/mcp/report.json) |
+| **B7a Invalid RE** | RE = 0 Ω → visible field error, no hang, no fake success/plot | Field error **"RE must be greater than 0."**, no `Simulation complete` badge, plot absent | **PASS** | [`B7a-invalid-re-state.json`](evidence/mcp/B7a-invalid-re-state.json), [`B7a-invalid-re.png`](evidence/mcp/B7a-invalid-re.png) |
+| **B7b Engine fail** | Explicit invalid `NGSPICE_PATH` → visible error with path, no plot | Badge `Simulation error`; message `ngspice not found at NGSPICE_PATH: C:\nope\ngspice.exe`; detail `Set NGSPICE_PATH to the ngspice_con.exe executable or leave it unset.`; plot absent. URL `http://127.0.0.1:5001/` | **PASS** | [`B7b-engine-fail-state.json`](evidence/mcp/B7b-engine-fail-state.json), [`B7b-engine-fail.png`](evidence/mcp/B7b-engine-fail.png). Separate Flask on port 5001, stopped after the run |
+| **B8 Desktop 1280×800** | No critical clipping, graph/units/buttons readable, mode switch works | Window 1280×800; `clientWidth`/`scrollWidth` **1265/1265**; AC plot 868×648 in a 772 px container (no scroll needed); buttons 190 px. Switch to Emitter → `DC Operating Point · Emitter bias`, no field errors | **PASS** | [`B8-desktop-ac-state.json`](evidence/mcp/B8-desktop-ac-state.json), [`B8-desktop-ac.png`](evidence/mcp/B8-desktop-ac.png), [`B8-desktop-emitter.png`](evidence/mcp/B8-desktop-emitter.png) |
+| **B8 Mobile 390×844** | Same content at phone width; graph may use its intended scroll container | Window 390×844; `clientWidth`/`scrollWidth` **375/375**; buttons full-width 333 px; plot container client 331 px / scroll 629 px (intentional horizontal plot scroll). Switch to Fixed → `DC Operating Point · Fixed bias`, no field errors | **PASS** | [`B8-mobile-ac-state.json`](evidence/mcp/B8-mobile-ac-state.json), [`B8-mobile-ac.png`](evidence/mcp/B8-mobile-ac.png), [`B8-mobile-fixed.png`](evidence/mcp/B8-mobile-fixed.png) |
 
-All B1–B8 subcases were **PASS** in the final run.
+All B1–B8 subcases were **PASS** in the MCP rerun.
 
 ## First finding and correction
 
-The first B1 divider run used β = 150 (the app's default) and produced
-IC 1.2991 mA / VCE 7.834 V, which failed against the Lab 3 A1 reference. This
-was an input mistake in the acceptance script, not an application defect: the
-handout asks for the original Lab 3 value set. The script was corrected to
-β = 100 and B1 was rerun; the three B1 rows above are from that rerun. No code
-was changed.
+In the earlier local pass, the first B1 divider run used β = 150 (the app's
+default) and produced IC 1.2991 mA / VCE 7.834 V, which failed against the Lab 3
+A1 reference. That was an input mistake in the acceptance script, not an
+application defect: the handout asks for the original Lab 3 value set. It was
+corrected to β = 100 and rerun. The MCP rerun used β = 100 from the start, so
+all three B1 rows above are clean MCP results. No code was changed.
 
 ## Why B4/B5/B6 are real runs, not mock plots
 
-- **B4:** the shown netlist contains `.ac dec 20 1 10Meg` and four `.print ac`
-  tables; the browser log excerpt contains real numeric rows; the PNG is
-  generated from parsed arrays. The full run recorded earlier in this file has
-  141 AC points, while the browser `<details>` intentionally shows only the
-  last 1500 characters (36 numeric rows in that excerpt).
+- **B4:** the shown netlist in `B4-ac-state.json` contains `.ac dec 20 1 10Meg`
+  and four `.print ac` tables; the browser log excerpt contains real numeric
+  rows; the PNG is generated from parsed arrays. The full run recorded earlier
+  in this file has 141 AC points, while the browser `<details>` intentionally
+  shows only the last 1500 characters (36 numeric rows in that excerpt).
 - **B5:** the shown netlist contains `.tran 10u 5m 0 10u` and
   `.print tran v(input) v(output)`; the table reports 508 parsed samples and
   5.000 ms; the log excerpt's final rows run from `t = 4.732800e-03` to
@@ -381,9 +392,10 @@ before/after screenshots are the evidence, not a claim that that skill ran.
 
 ## Limitations kept visible
 
-- Playwright MCP was unavailable; the accepted browser is local
-  Playwright 1.65.1 + Chrome channel, not MCP. This is stated rather than
-  disguised.
+- Playwright MCP was unavailable for the first local pass, so that pass was
+  reported honestly as local Playwright + Chrome. MCP was connected before the
+  final rerun, and the accepted table above uses `tools.playwright.*`. No
+  historical local result was relabelled as an MCP result.
 - The page shows only the last 1500 characters of the ngspice log. Browser B5
   peak |Vout| is 0.01758687 V from that excerpt; the earlier full-run value is
   0.01758797 V, a 1.1×10⁻⁶ V difference caused by the truncated excerpt, well
@@ -403,7 +415,16 @@ before/after screenshots are the evidence, not a claim that that skill ran.
 
 Open <http://127.0.0.1:5000/>, type the fixture values listed above, select
 `dc`/`ac`/`tran`, then press **Run Simulation**. The netlist and log are in the
-page's `<details>` sections. Full machine-readable observations are in
+page's `<details>` sections. To rerun the browser acceptance with MCP, add the
+global local server once:
+
+```sh
+opencode mcp add playwright --global -- npx -y @playwright/mcp@latest --browser chrome --isolated
+opencode mcp list
+```
+
+Machine-readable observations: accepted MCP rerun in
+[`evidence/mcp/report.json`](evidence/mcp/report.json); earlier local pass in
 [`evidence/B1-B8-report.json`](evidence/B1-B8-report.json).
 
 ## Commits

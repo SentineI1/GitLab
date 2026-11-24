@@ -17,22 +17,23 @@
 | GitHub URL + Commit SHA for Lab 4 | This section; code SHAs are fixed, documentation commit from `git log -1` |
 | Flask app with CE SPICE DC/AC/Transient and the 3 original DC Bias modes | `app.py`, `spice_engine.py`, `plots.py`, `templates/index.html`; 70 tests OK |
 | README installation, ngspice, server and browser steps | [`README.md`](../README.md), sections “Setup”, “Run”, “SPICE simulation (Lab 4 v1)” |
-| `docs/validation.md` records B1–B8, method, observed results, references, deviations and limits | [`docs/validation.md`](validation.md), section “Lab 4 — Browser acceptance B1–B8” |
-| Before/after UI screenshots or Impeccable record, plus real-browser graph screenshots | [`ui-before-desktop-ac.png`](evidence/ui-before-desktop-ac.png) → [`ui-after-desktop-ac.png`](evidence/ui-after-desktop-ac.png), [`ui-before-mobile-ac.png`](evidence/ui-before-mobile-ac.png) → [`ui-after-mobile-ac.png`](evidence/ui-after-mobile-ac.png); B4/B5/B6 screenshots in [`docs/evidence/`](evidence/) |
+| `docs/validation.md` records B1–B8, method, observed results, references, deviations and limits | [`docs/validation.md`](validation.md), section “Lab 4 — Browser acceptance B1–B8”; accepted MCP rerun in [`evidence/mcp/report.json`](evidence/mcp/report.json) |
+| Before/after UI screenshots or Impeccable record, plus real-browser graph screenshots | [`ui-before-desktop-ac.png`](evidence/ui-before-desktop-ac.png) → [`ui-after-desktop-ac.png`](evidence/ui-after-desktop-ac.png), [`ui-before-mobile-ac.png`](evidence/ui-before-mobile-ac.png) → [`ui-after-mobile-ac.png`](evidence/ui-after-mobile-ac.png); MCP screenshots for B4/B5/B6 in [`evidence/mcp/`](evidence/mcp/) |
 | 3–5 lines recording AI work and student checks | “AI / student record” below |
 | Short oral-check answers | “Short answers for individual checking” below |
 
 Not committed: `.venv/`, `.env`, `tools/ngspice/` (the ngspice binary), API keys,
-tokens and temporary Playwright scripts. `docs/evidence/` contains only selected
-screenshots and the 25 KB `B1-B8-report.json`; the simulation can be regenerated
-with the commands below.
+tokens and temporary orchestration scripts. `docs/evidence/` contains selected
+screenshots plus the earlier local run report; `docs/evidence/mcp/` contains the
+accepted Playwright MCP rerun (snapshots, per-case `*-state.json`, screenshots
+and `report.json`). The simulation can be regenerated with the commands below.
 
 ## AI / student record
 
 - **AI created:** the ngspice adapter (`spice_engine.py`), data-driven plots (`plots.py`), the SPICE panel in `app.py`/`templates/index.html`, and later UI polish (fieldsets, provenance chips, responsive plot scroll, error callouts).
-- **AI recorded honestly:** Playwright MCP and the `impeccable` skill were not exposed in this harness; local Playwright + Chrome and before/after screenshots were used instead, and this is stated in `docs/validation.md`.
+- **AI recorded honestly:** Playwright MCP was unavailable for the first browser pass, so that pass was labelled local Playwright + Chrome. MCP was then connected and B1–B8 were rerun with `tools.playwright.*`; the `impeccable` skill was still not exposed, so before/after screenshots are used for the UI check.
 - **Student checked:** the analytical equations and units, the fixed model `.model CEQ NPN(IS=1E-14 BF=<beta> VAF=100)`, and the separation of analytical (fixed VBE, constant β) from SPICE (model-derived VBE).
-- **Student checked in a real browser:** B1–B8 with fresh navigation, snapshots and real submits; compared netlists, ngspice log rows and plot hashes so the Bode/waveform traces are demonstrably not mock data.
+- **Student checked in a real browser:** B1–B8 were rerun through Playwright MCP with fresh navigation, snapshots and real submits; compared netlists, ngspice log rows and plot hashes so the Bode/waveform traces are demonstrably not mock data.
 - **Student checked failure paths:** RE = 0 and an explicitly invalid `NGSPICE_PATH`; both show visible errors with no success badge and no plot.
 
 ## Short answers for individual checking
@@ -83,7 +84,7 @@ respond to netlist changes.
 | ngspice connection | 3 | B2 PASS, netlist/log details, exit code 0, visible model; B7 failure gates; adapter tests |
 | AC + Transient | 2 | B4, B5 and B6 PASS with real `.print` provenance, units and source response |
 | UI and Impeccable | 2 | Before/after screenshots above; UI commit `51b14b1`; plot data unchanged |
-| Browser acceptance | 1 | B1–B8 table and [`B1-B8-report.json`](evidence/B1-B8-report.json), with honest MCP/skill limitations |
+| Browser acceptance | 1 | B1–B8 table from the MCP rerun, [`evidence/mcp/report.json`](evidence/mcp/report.json), per-case states/screenshots, with honest notes about the earlier local pass and the unavailable `impeccable` skill |
 | GitHub + reproducibility | 1 | This file, README setup/run/test commands, fixed code SHAs, selected evidence, no binaries committed |
 
 ## Reproduce locally

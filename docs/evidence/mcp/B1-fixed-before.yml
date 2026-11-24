@@ -1,0 +1,149 @@
+- main [ref=f12e2]:
+  - heading "BJT Common-Emitter Bias Calculator" [level=1] [ref=f12e3]
+  - paragraph [ref=f12e4]: Enter the DC bias values of an NPN common-emitter stage and pick the bias network. The calculator reports the operating point, warns when the transistor is not in the active region, and (for the divider) checks the result with a second method.
+  - generic [ref=f12e5]:
+    - figure "beta = 100 · VBE = 0.7 V Active" [ref=f12e6]:
+      - 'img "NPN common-emitter bias circuit: VCC feeds R1 and RC; R2 and RE return to ground." [ref=f12e7]':
+        - generic [ref=f12e17]: VCC
+        - generic [ref=f12e18]: 12 V
+        - generic [ref=f12e19]: R1
+        - generic [ref=f12e20]: 100000 ohm
+        - generic [ref=f12e21]: R2
+        - generic [ref=f12e22]: 22000 ohm
+        - generic [ref=f12e23]: RC
+        - generic [ref=f12e24]: 2200 ohm
+        - generic [ref=f12e25]: RE
+        - generic [ref=f12e26]: 1000 ohm
+        - generic [ref=f12e27]: Q1
+      - generic [ref=f12e28]:
+        - generic [ref=f12e29]: beta = 100 · VBE = 0.7 V
+        - generic [ref=f12e30]: Active
+    - generic [ref=f12e31]:
+      - group "Bias network" [ref=f12e32]:
+        - generic [ref=f12e34]:
+          - generic [ref=f12e35]: Bias mode
+          - combobox "Bias mode" [ref=f12e36]:
+            - option "Voltage-divider bias"
+            - option "Fixed bias" [selected]
+            - option "Emitter bias"
+        - generic [ref=f12e37]:
+          - generic [ref=f12e38]: VCC (V)
+          - spinbutton "VCC (V)" [ref=f12e39]: "12"
+        - generic [ref=f12e40]:
+          - generic [ref=f12e41]: R1 (ohm) · divider
+          - spinbutton "R1 (ohm) · divider" [ref=f12e42]: "100000"
+        - generic [ref=f12e43]:
+          - generic [ref=f12e44]: R2 (ohm) · divider
+          - spinbutton "R2 (ohm) · divider" [ref=f12e45]: "22000"
+        - generic [ref=f12e46]:
+          - generic [ref=f12e47]: RB (ohm) · fixed / emitter
+          - spinbutton "RB (ohm) · fixed / emitter" [ref=f12e48]: "1200000"
+        - generic [ref=f12e49]:
+          - generic [ref=f12e50]: RC (ohm)
+          - spinbutton "RC (ohm)" [ref=f12e51]: "2200"
+        - generic [ref=f12e52]:
+          - generic [ref=f12e53]: RE (ohm) · divider / emitter
+          - spinbutton "RE (ohm) · divider / emitter" [ref=f12e54]: "1000"
+      - group "Device parameters" [ref=f12e55]:
+        - generic [ref=f12e57]:
+          - generic [ref=f12e58]: beta
+          - spinbutton "beta" [ref=f12e59]: "100"
+        - generic [ref=f12e60]:
+          - generic [ref=f12e61]: VBE (V)
+          - spinbutton "VBE (V)" [ref=f12e62]: "0.7"
+      - group "SPICE source" [ref=f12e63]:
+        - generic [ref=f12e65]:
+          - generic [ref=f12e66]: SPICE analysis · divider mode only
+          - combobox "SPICE analysis · divider mode only" [ref=f12e67]:
+            - option "DC operating point" [selected]
+            - option "AC frequency response"
+            - option "Transient waveform"
+        - paragraph [ref=f12e68]:
+          - text: Runs local
+          - code [ref=f12e69]: ngspice_con.exe
+          - text: ; the netlist and engine log are shown after each run.
+        - generic [ref=f12e70]:
+          - generic [ref=f12e71]: Source amplitude (mV peak)
+          - spinbutton "Source amplitude (mV peak)" [ref=f12e72]: "10"
+        - generic [ref=f12e73]:
+          - generic [ref=f12e74]: Source frequency (Hz)
+          - spinbutton "Source frequency (Hz)" [ref=f12e75]: "1000"
+      - generic [ref=f12e76]:
+        - button "Calculate" [ref=f12e77] [cursor=pointer]
+        - button "Run Simulation" [ref=f12e78] [cursor=pointer]
+  - generic [ref=f12e79]:
+    - heading "DC Operating Point · Voltage-divider bias" [level=2] [ref=f12e80]
+    - paragraph [ref=f12e81]:
+      - generic [ref=f12e82]: "Source: analytical model · fixed VBE, constant beta"
+    - paragraph [ref=f12e83]:
+      - generic [ref=f12e84]: Active
+    - paragraph [ref=f12e85]: "Active: the transistor is in the active region."
+    - table [ref=f12e86]:
+      - rowgroup [ref=f12e87]:
+        - row [ref=f12e88]:
+          - columnheader "Quantity" [ref=f12e89]
+          - columnheader "Value" [ref=f12e90]
+          - columnheader "Unit" [ref=f12e91]
+      - rowgroup [ref=f12e92]:
+        - row [ref=f12e93]:
+          - cell "VBB" [ref=f12e94]
+          - cell "2.164" [ref=f12e95]
+          - cell "V" [ref=f12e96]
+        - row [ref=f12e97]:
+          - cell "RB" [ref=f12e98]
+          - cell "18032.787" [ref=f12e99]
+          - cell "ohm" [ref=f12e100]
+        - row [ref=f12e101]:
+          - cell "IB" [ref=f12e102]
+          - cell "0.0123" [ref=f12e103]
+          - cell "mA" [ref=f12e104]
+        - row [ref=f12e105]:
+          - cell "IC" [ref=f12e106]
+          - cell "1.2299" [ref=f12e107]
+          - cell "mA" [ref=f12e108]
+        - row [ref=f12e109]:
+          - cell "IE" [ref=f12e110]
+          - cell "1.2422" [ref=f12e111]
+          - cell "mA" [ref=f12e112]
+        - row [ref=f12e113]:
+          - cell "VB" [ref=f12e114]
+          - cell "1.942" [ref=f12e115]
+          - cell "V" [ref=f12e116]
+        - row [ref=f12e117]:
+          - cell "VC" [ref=f12e118]
+          - cell "9.294" [ref=f12e119]
+          - cell "V" [ref=f12e120]
+        - row [ref=f12e121]:
+          - cell "VE" [ref=f12e122]
+          - cell "1.242" [ref=f12e123]
+          - cell "V" [ref=f12e124]
+        - row [ref=f12e125]:
+          - cell "VCE" [ref=f12e126]
+          - cell "8.052" [ref=f12e127]
+          - cell "V" [ref=f12e128]
+    - paragraph [ref=f12e129]: Values are the raw solution of the model equations; nothing is clamped.
+  - generic [ref=f12e130]:
+    - heading "Cross-check" [level=2] [ref=f12e131]
+    - paragraph [ref=f12e132]: "The same operating point solved twice: the Thevenin reduction of the base divider and a Nodal solve of Kirchhoff's current law at the base node. The two paths share no algebra."
+    - table [ref=f12e133]:
+      - rowgroup [ref=f12e134]:
+        - row [ref=f12e135]:
+          - columnheader "Quantity" [ref=f12e136]
+          - columnheader "Thevenin" [ref=f12e137]
+          - columnheader "Nodal" [ref=f12e138]
+          - columnheader "|delta|" [ref=f12e139]
+          - columnheader "Relative" [ref=f12e140]
+      - rowgroup [ref=f12e141]:
+        - row [ref=f12e142]:
+          - cell "IC (mA)" [ref=f12e143]
+          - cell "1.2299" [ref=f12e144]
+          - cell "1.2299" [ref=f12e145]
+          - cell "2.220e-16" [ref=f12e146]
+          - cell "1.805e-16" [ref=f12e147]
+        - row [ref=f12e148]:
+          - cell "VCE (V)" [ref=f12e149]
+          - cell "8.052" [ref=f12e150]
+          - cell "8.052" [ref=f12e151]
+          - cell "0.000e+00" [ref=f12e152]
+          - cell "0.000e+00" [ref=f12e153]
+    - paragraph [ref=f12e154]: The two methods agree.

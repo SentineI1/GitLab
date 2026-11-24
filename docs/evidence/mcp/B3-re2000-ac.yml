@@ -1,0 +1,195 @@
+- main [ref=f19e2]:
+  - heading "BJT Common-Emitter Bias Calculator" [level=1] [ref=f19e3]
+  - paragraph [ref=f19e4]: Enter the DC bias values of an NPN common-emitter stage and pick the bias network. The calculator reports the operating point, warns when the transistor is not in the active region, and (for the divider) checks the result with a second method.
+  - generic [ref=f19e5]:
+    - figure "beta = 150 · VBE = 0.7 V Active" [ref=f19e6]:
+      - 'img "NPN common-emitter bias circuit: VCC feeds R1 and RC; R2 and RE return to ground." [ref=f19e7]':
+        - generic [ref=f19e17]: VCC
+        - generic [ref=f19e18]: 12 V
+        - generic [ref=f19e19]: R1
+        - generic [ref=f19e20]: 100000 ohm
+        - generic [ref=f19e21]: R2
+        - generic [ref=f19e22]: 22000 ohm
+        - generic [ref=f19e23]: RC
+        - generic [ref=f19e24]: 2200 ohm
+        - generic [ref=f19e25]: RE
+        - generic [ref=f19e26]: 2000 ohm
+        - generic [ref=f19e27]: Q1
+      - generic [ref=f19e28]:
+        - generic [ref=f19e29]: beta = 150 · VBE = 0.7 V
+        - generic [ref=f19e30]: Active
+    - generic [ref=f19e31]:
+      - group "Bias network" [ref=f19e32]:
+        - generic [ref=f19e34]:
+          - generic [ref=f19e35]: Bias mode
+          - combobox "Bias mode" [ref=f19e36]:
+            - option "Voltage-divider bias" [selected]
+            - option "Fixed bias"
+            - option "Emitter bias"
+        - generic [ref=f19e37]:
+          - generic [ref=f19e38]: VCC (V)
+          - spinbutton "VCC (V)" [ref=f19e39]: "12"
+        - generic [ref=f19e40]:
+          - generic [ref=f19e41]: R1 (ohm) · divider
+          - spinbutton "R1 (ohm) · divider" [ref=f19e42]: "100000"
+        - generic [ref=f19e43]:
+          - generic [ref=f19e44]: R2 (ohm) · divider
+          - spinbutton "R2 (ohm) · divider" [ref=f19e45]: "22000"
+        - generic [ref=f19e46]:
+          - generic [ref=f19e47]: RB (ohm) · fixed / emitter
+          - spinbutton "RB (ohm) · fixed / emitter" [ref=f19e48]: "1200000"
+        - generic [ref=f19e49]:
+          - generic [ref=f19e50]: RC (ohm)
+          - spinbutton "RC (ohm)" [ref=f19e51]: "2200"
+        - generic [ref=f19e52]:
+          - generic [ref=f19e53]: RE (ohm) · divider / emitter
+          - spinbutton "RE (ohm) · divider / emitter" [ref=f19e54]: "2000"
+      - group "Device parameters" [ref=f19e55]:
+        - generic [ref=f19e57]:
+          - generic [ref=f19e58]: beta
+          - spinbutton "beta" [ref=f19e59]: "150"
+        - generic [ref=f19e60]:
+          - generic [ref=f19e61]: VBE (V)
+          - spinbutton "VBE (V)" [ref=f19e62]: "0.7"
+      - group "SPICE source" [ref=f19e63]:
+        - generic [ref=f19e65]:
+          - generic [ref=f19e66]: SPICE analysis · divider mode only
+          - combobox "SPICE analysis · divider mode only" [ref=f19e67]:
+            - option "DC operating point"
+            - option "AC frequency response" [selected]
+            - option "Transient waveform"
+        - paragraph [ref=f19e68]:
+          - text: Runs local
+          - code [ref=f19e69]: ngspice_con.exe
+          - text: ; the netlist and engine log are shown after each run.
+        - generic [ref=f19e70]:
+          - generic [ref=f19e71]: Source amplitude (mV peak)
+          - spinbutton "Source amplitude (mV peak)" [ref=f19e72]: "10"
+        - generic [ref=f19e73]:
+          - generic [ref=f19e74]: Source frequency (Hz)
+          - spinbutton "Source frequency (Hz)" [ref=f19e75]: "1000"
+      - generic [ref=f19e76]:
+        - button "Calculate" [ref=f19e77] [cursor=pointer]
+        - button "Run Simulation" [ref=f19e78] [cursor=pointer]
+  - generic [ref=f19e79]:
+    - heading "Analytical reference · DC Operating Point · Voltage-divider bias" [level=2] [ref=f19e80]
+    - paragraph [ref=f19e81]:
+      - generic [ref=f19e82]: "Source: analytical model · fixed VBE, constant beta"
+    - paragraph [ref=f19e83]:
+      - generic [ref=f19e84]: Active
+    - paragraph [ref=f19e85]: "Active: the transistor is in the active region."
+    - table [ref=f19e86]:
+      - rowgroup [ref=f19e87]:
+        - row [ref=f19e88]:
+          - columnheader "Quantity" [ref=f19e89]
+          - columnheader "Value" [ref=f19e90]
+          - columnheader "Unit" [ref=f19e91]
+      - rowgroup [ref=f19e92]:
+        - row [ref=f19e93]:
+          - cell "VBB" [ref=f19e94]
+          - cell "2.164" [ref=f19e95]
+          - cell "V" [ref=f19e96]
+        - row [ref=f19e97]:
+          - cell "RB" [ref=f19e98]
+          - cell "18032.787" [ref=f19e99]
+          - cell "ohm" [ref=f19e100]
+        - row [ref=f19e101]:
+          - cell "IB" [ref=f19e102]
+          - cell "0.0046" [ref=f19e103]
+          - cell "mA" [ref=f19e104]
+        - row [ref=f19e105]:
+          - cell "IC" [ref=f19e106]
+          - cell "0.6861" [ref=f19e107]
+          - cell "mA" [ref=f19e108]
+        - row [ref=f19e109]:
+          - cell "IE" [ref=f19e110]
+          - cell "0.6907" [ref=f19e111]
+          - cell "mA" [ref=f19e112]
+        - row [ref=f19e113]:
+          - cell "VB" [ref=f19e114]
+          - cell "2.081" [ref=f19e115]
+          - cell "V" [ref=f19e116]
+        - row [ref=f19e117]:
+          - cell "VC" [ref=f19e118]
+          - cell "10.490" [ref=f19e119]
+          - cell "V" [ref=f19e120]
+        - row [ref=f19e121]:
+          - cell "VE" [ref=f19e122]
+          - cell "1.381" [ref=f19e123]
+          - cell "V" [ref=f19e124]
+        - row [ref=f19e125]:
+          - cell "VCE" [ref=f19e126]
+          - cell "9.109" [ref=f19e127]
+          - cell "V" [ref=f19e128]
+    - paragraph [ref=f19e129]: Values are the raw solution of the model equations; nothing is clamped.
+  - generic [ref=f19e130]:
+    - heading "Analytical reference · Cross-check" [level=2] [ref=f19e131]
+    - paragraph [ref=f19e132]: "The same operating point solved twice: the Thevenin reduction of the base divider and a Nodal solve of Kirchhoff's current law at the base node. The two paths share no algebra."
+    - table [ref=f19e133]:
+      - rowgroup [ref=f19e134]:
+        - row [ref=f19e135]:
+          - columnheader "Quantity" [ref=f19e136]
+          - columnheader "Thevenin" [ref=f19e137]
+          - columnheader "Nodal" [ref=f19e138]
+          - columnheader "|delta|" [ref=f19e139]
+          - columnheader "Relative" [ref=f19e140]
+      - rowgroup [ref=f19e141]:
+        - row [ref=f19e142]:
+          - cell "IC (mA)" [ref=f19e143]
+          - cell "0.6861" [ref=f19e144]
+          - cell "0.6861" [ref=f19e145]
+          - cell "1.110e-16" [ref=f19e146]
+          - cell "1.618e-16" [ref=f19e147]
+        - row [ref=f19e148]:
+          - cell "VCE (V)" [ref=f19e149]
+          - cell "9.109" [ref=f19e150]
+          - cell "9.109" [ref=f19e151]
+          - cell "0.000e+00" [ref=f19e152]
+          - cell "0.000e+00" [ref=f19e153]
+    - paragraph [ref=f19e154]: The two methods agree.
+  - generic [ref=f19e155]:
+    - heading "SPICE simulation · ngspice" [level=2] [ref=f19e156]
+    - paragraph [ref=f19e157]:
+      - generic [ref=f19e158]: Simulation complete
+      - text: AC frequency response
+    - paragraph [ref=f19e159]:
+      - generic [ref=f19e160]: "Source: real ngspice .print tables"
+      - generic [ref=f19e161]:
+        - text: "Engine:"
+        - code [ref=f19e162]: C:\Users\B6830021\Desktop\GitLab\tools\ngspice\Spice64\bin\ngspice_con.exe
+    - paragraph [ref=f19e163]:
+      - text: Engine
+      - code [ref=f19e164]: C:\Users\B6830021\Desktop\GitLab\tools\ngspice\Spice64\bin\ngspice_con.exe
+      - text: · exit code 0 · model
+      - code [ref=f19e165]: .model CEQ NPN(IS=1E-14 BF=150 VAF=100)
+    - heading "SPICE output — ngspice, model CEQ" [level=3] [ref=f19e166]
+    - table [ref=f19e167]:
+      - rowgroup [ref=f19e168]:
+        - row [ref=f19e169]:
+          - columnheader "Quantity" [ref=f19e170]
+          - columnheader "Value" [ref=f19e171]
+          - columnheader "Unit" [ref=f19e172]
+      - rowgroup [ref=f19e173]:
+        - row [ref=f19e174]:
+          - cell "Midband gain" [ref=f19e175]
+          - cell "-1.112" [ref=f19e176]
+          - cell "dB" [ref=f19e177]
+        - row [ref=f19e178]:
+          - cell "Lower -3 dB" [ref=f19e179]
+          - cell "1.3096767985326347" [ref=f19e180]
+          - cell "Hz" [ref=f19e181]
+        - row [ref=f19e182]:
+          - cell "Upper -3 dB" [ref=f19e183]
+          - cell "not determined in sweep range" [ref=f19e184]
+          - cell "Hz" [ref=f19e185]
+        - row [ref=f19e186]:
+          - cell "Gain reference" [ref=f19e187]
+          - cell "V(output) / V(base)" [ref=f19e188]
+          - cell "—" [ref=f19e189]
+    - figure "Gain and phase from the real ngspice AC sweep. Frequency (Hz) is a log axis; dashed lines mark -3 dB crossings when the sweep reaches them." [ref=f19e190]:
+      - img "ngspice AC gain and phase versus frequency" [ref=f19e192]
+    - group [ref=f19e194]:
+      - generic "Netlist used" [ref=f19e195] [cursor=pointer]
+    - group [ref=f19e196]:
+      - generic "ngspice log (last 1500 characters)" [ref=f19e197] [cursor=pointer]
+    - paragraph [ref=f19e198]: SPICE values above are produced by ngspice from the netlist shown. The analytical reference uses a fixed VBE and constant beta, while SPICE derives VBE from IS/BF/VAF; the two are not expected to match exactly.

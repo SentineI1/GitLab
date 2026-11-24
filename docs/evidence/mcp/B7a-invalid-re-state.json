@@ -1,0 +1,30 @@
+{
+  "url": "http://127.0.0.1:5000/",
+  "title": "BJT Common-Emitter Bias Calculator",
+  "readyState": "complete",
+  "headings": [],
+  "badge": "",
+  "analysisName": "",
+  "engineNote": "",
+  "simError": "",
+  "engineDetail": "",
+  "fieldErrors": [
+    "RE must be greater than 0."
+  ],
+  "analyticalRows": [],
+  "crosscheckRows": [],
+  "spiceRows": [],
+  "details": [],
+  "plot": null,
+  "plotScroll": null,
+  "sourceChips": [],
+  "layout": {
+    "viewport": 1265,
+    "scrollWidth": 1265,
+    "workspaceColumns": "395px 395px",
+    "buttons": [
+      190,
+      190
+    ]
+  }
+}

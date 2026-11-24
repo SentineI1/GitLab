@@ -221,6 +221,10 @@ calculations, tool names, and browser evidence are recorded in
 [`docs/validation.md`](docs/validation.md), with a screenshot at
 [`docs/evidence/A5-fixed-rb0.png`](docs/evidence/A5-fixed-rb0.png).
 
+Lab 4 B1–B8 were also rerun through Playwright MCP after the server was
+connected; the accepted snapshots, per-case DOM/state JSON, screenshots and
+`report.json` are in [`docs/evidence/mcp/`](docs/evidence/mcp/).
+
 Repository: <https://github.com/SentineI1/GitLab>. The Lab 3 feature commits
 are `ac59a8b`, `cebf0e1`, and `9ca9343`. Lab 4 implementation commits are
 `402217e` (ngspice adapter), `8b63078` (web SPICE runs and plots) and
